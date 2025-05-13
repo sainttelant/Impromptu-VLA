@@ -244,16 +244,13 @@ def process_single_sequence(
         scene_id = file_to_scene_id(sequence_file)
 
         # 获取指定场景ID对应的文件名（行号）
-        # total_list = open(
-        #     "/data_storage/gaoha/Downloads/waymo/val.txt", "r"
-        # ).readlines()
-        total_list = open(
-            "/data_storage/gaoha/Downloads/waymo/test.txt", "r"
-        ).readlines()
-        # total_list = open(
-        #     "/data_storage/gaoha/Downloads/waymo/train.txt", "r"
-        # ).readlines()
-        # 这个txt的作用是对scene_id 的重映射，但我没找到准确的txt，所以一个都对不上，所以scene_id 将保持它最初的值，不影响文件夹数目
+        import os
+        current_dir = os.path.dirname(__file__)
+        relative_path = os.path.join(current_dir, 'waymo', 'val.txt')
+        total_list = open(relative_path, "r").readlines()  
+        # relative_path = os.path.join(current_dir, 'waymo', 'train.txt')
+        # total_list = open(relative_path, "r").readlines()  
+        #attention： 这个txt的作用是对scene_id 的重映射，但我没找到准确的txt，导致一个都对不上，所以scene_id 将保持它最初的值，无论什么txt都不影响文件夹数目
         for index, line in enumerate(total_list):
             if scene_id == line.strip():
                 scene_id = f"{index:03d}"
