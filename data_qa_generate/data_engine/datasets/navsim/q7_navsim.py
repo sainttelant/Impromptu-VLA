@@ -1,4 +1,3 @@
-# follow driveemma
 import os
 import json
 import math
@@ -9,15 +8,16 @@ from tqdm import tqdm
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
 from collections import defaultdict
-from data_engine.datasets.navsim.dataset_navsim_ljn import VLMNavsim
 from pathlib import Path
+import sys
 script_path = Path(__file__).resolve()
-project_root = script_path.parent.parent
+project_root = script_path.parent.parent.parent.parent.parent
+sys.path.append(f"{project_root}/data_qa_generate/")
+from data_engine.datasets.navsim.dataset_navsim import VLMNavsim
 qa_root = project_root / "data_qa_results" / "navsim"
 os.makedirs(qa_root, exist_ok=True)
 # Configuration constants
 class Config:
-    # Trajectory planning parameters
     NUM_FUT = 4
     NUM_FUT_NAVI = 12
     VEL_NAVI_THRESH = 4.0
@@ -38,8 +38,8 @@ class Config:
 
 def get_scene_data(dataset: VLMNavsim) -> Dict[str, Dict[str, Any]]:
     """
-    按场景组织数据，包括轨迹、速度和加速度等信息
-    返回结构: 
+    Organize data by scenario, including trajectory, velocity, and acceleration information
+    Return structure: 
     {
         "scene_token_1": {
             "metadata": {
@@ -105,7 +105,7 @@ def get_scene_data(dataset: VLMNavsim) -> Dict[str, Dict[str, Any]]:
     return dict(scene_data)
 
 def get_scene_data(dataset: VLMNavsim) -> Dict[str, Dict[str, Any]]:
-    """修复1：处理场景中所有帧"""
+  
     scene_data = defaultdict(dict)
     
     for idx in tqdm(range(len(dataset)), desc="Processing scenes"):
@@ -126,11 +126,11 @@ def get_scene_data(dataset: VLMNavsim) -> Dict[str, Dict[str, Any]]:
                 "frames": []
             }
         
-        # 修复：遍历所有帧而不是取中间帧
+    
         for frame in frame_data:
             ego_status = frame["ego_status"]
             
-            # 修复3：正确解析航向角
+          
             quat = ego_status.ego_pose[3:]
             yaw = Rotation.from_quat(quat).as_euler('zyx')[0]
             
@@ -151,7 +151,7 @@ def get_scene_data(dataset: VLMNavsim) -> Dict[str, Dict[str, Any]]:
             scene_data[scene_token]["frames"].append(frame_info)
             scene_data[scene_token]["metadata"]["num_frames"] += 1
     
-    # 系统优化：过滤无效短场景
+   
     return {
         k: v for k, v in dict(scene_data).items() 
         if v["metadata"]["num_frames"] >= Config.MIN_SCENE_FRAMES
@@ -210,13 +210,10 @@ def global_to_ego(global_x, global_y, ego_x, ego_y, ego_yaw_rad):
     )
 
 def generate_q7_for_scene(images, scene_frames: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    为单个场景生成Q7数据
-    如果过去或未来的一连串轨迹点中出现相邻两个点之间的距离大于20，那就不对这个样本构建qa加入
-    """
+   
     qas = []
     
-    # 提取所有帧的位置、速度和加速度
+ 
     enu_positions = [frame["position"] for frame in scene_frames]
     velocities = [frame["velocity"] for frame in scene_frames]
     accelerations = [frame["acceleration"] for frame in scene_frames]
@@ -224,17 +221,17 @@ def generate_q7_for_scene(images, scene_frames: List[Dict[str, Any]]) -> List[Di
     # 为每个有效帧生成Q7数据
     for i in range(len(scene_frames)):
         if i < 3 or i + 10 >= len(scene_frames):
-            continue  # 确保有足够的历史和未来数据
+            continue  
             
         current_ego_x, current_ego_y, current_yaw = enu_positions[i][0], enu_positions[i][1], enu_positions[i][2]
             
-        # 生成历史状态行
+        
         status_lines = []
         for time_offset, idx in [(-1.5, i-3), (-1.0, i-2), (-0.5, i-1)]:
             if idx < 0:
                 continue
                 
-            # 转换为ego-centric坐标
+         
             global_x, global_y = enu_positions[idx][0], enu_positions[idx][1]
             ego_x_new, ego_y_new = global_to_ego(
                 global_x, global_y,
@@ -242,7 +239,6 @@ def generate_q7_for_scene(images, scene_frames: List[Dict[str, Any]]) -> List[Di
                 current_yaw
             )
             
-            # 获取加速度和速度
             acc_x, acc_y = accelerations[idx][0], accelerations[idx][1]
             vel_x, vel_y = velocities[idx][0], velocities[idx][1]
             
@@ -252,7 +248,6 @@ def generate_q7_for_scene(images, scene_frames: List[Dict[str, Any]]) -> List[Di
                 f"Velocity: X {vel_x:.2f}, Y {vel_y:.2f} m/s"
             )
         
-        # 生成未来状态行
         status_lines_future = []
         for idx in range(i+1, i+11):
             if idx >= len(enu_positions):
@@ -266,11 +261,10 @@ def generate_q7_for_scene(images, scene_frames: List[Dict[str, Any]]) -> List[Di
             )
             status_lines_future.append(f"[{ego_x_new:.2f}, {ego_y_new:.2f}]")
         
-        # 确保有足够的数据点
+
         if len(status_lines) != 3 or len(status_lines_future) != 10:
             continue
-        
-        # 构建问题和答案
+      
         question = (
             "You are an autonomous driving agent. You have access to multi-view camera images of a vehicle: "
             "(1) front view (which you should focus on with the most attention) <image>, "
@@ -289,7 +283,7 @@ def generate_q7_for_scene(images, scene_frames: List[Dict[str, Any]]) -> List[Di
             f"{', '.join(status_lines_future)}\n"
         )
         
-        # 创建QA对
+     
         qas.append({
             "images": [images[i][0], images[i][2], images[i][1]],  # 前视、右前、左前
             "messages": [
@@ -301,14 +295,9 @@ def generate_q7_for_scene(images, scene_frames: List[Dict[str, Any]]) -> List[Di
     return qas
 
 def generate_q7_data(mode,images,dataset: VLMNavsim, output_dir: str):
-    """
-    生成按场景分类的Q7数据
-    """
-    # 获取按场景组织的数据
+
     scene_data = get_scene_data(dataset)
 
-  
-    # 为每个场景生成Q7数据
     all_q7_data = []
     cnt_frame=0
     for scene_token, data in tqdm(scene_data.items(), desc="Generating Q7 data per scene"):
@@ -317,9 +306,8 @@ def generate_q7_data(mode,images,dataset: VLMNavsim, output_dir: str):
         cnt_frame+=num_frames_this_scene
         all_q7_data.extend(scene_q7)
     
-    # 保存数据
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, f"{mode}_q7_scene_organized_filter1.json")
+    output_path = os.path.join(output_dir, f"q7_{mode}.json")
     with open(output_path, "w") as f:
         json.dump(all_q7_data, f, indent=2, ensure_ascii=False)
     

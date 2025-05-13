@@ -1,0 +1,3 @@
+# ninja log v5
+1	24439	1737020375085143545	/baai-cwm-1/baai_cwm_ml/algorithm/huanang.gao/workspace/202501-drivelm-dpo/LLaVA-CoT/dataset_generation/mmdet3d_plugin/ops/build/temp.linux-x86_64-3.9/src/deformable_aggregation_cuda.o	e69644e49b34c61f
+1	26251	1737020376927615092	/baai-cwm-1/baai_cwm_ml/algorithm/huanang.gao/workspace/202501-drivelm-dpo/LLaVA-CoT/dataset_generation/mmdet3d_plugin/ops/build/temp.linux-x86_64-3.9/src/deformable_aggregation.o	54e96ba76bc9f57c
