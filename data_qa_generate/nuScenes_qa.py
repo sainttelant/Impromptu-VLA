@@ -1,0 +1,1 @@
+# We follow Senna to load the nuScenes dataset: GitHub - hustvl/Senna: Bridging Large Vision-Language Models and End-to-End Autonomous Driving.
