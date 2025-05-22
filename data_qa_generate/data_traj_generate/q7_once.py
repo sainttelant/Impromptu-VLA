@@ -56,9 +56,9 @@ def fps(traj_f):
 
 views = {
     "cam01": "front left view image <image>",     # cam01
-    "cam02": "front right image <image>",         # cam02（实际不存在）
+    "cam02": "front right image <image>",         # cam02
     "cam03": "front center image <image>",        # cam03
-    "cam04": "rear left image <image>",           # cam04（实际不存在）
+    "cam04": "rear left image <image>",           # cam04
     "cam05": "side left front image <image>",     # cam05
     "cam06": "side left center image <image>",    # cam06
     "cam07": "side right front image <image>",    # cam07

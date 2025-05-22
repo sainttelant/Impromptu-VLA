@@ -173,8 +173,6 @@ class OnceProcessor:
             print(f"Error saving output file: {e}")
 
 
-
-# 使用示例
 if __name__ == "__main__":
     base_path = f"{data_dir}/ONCE/3D_infos/untar/data/"
     processor = OnceProcessor(

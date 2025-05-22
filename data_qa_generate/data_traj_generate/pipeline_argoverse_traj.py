@@ -18,10 +18,9 @@ class ArgoversePlanning:
         self.output_file.parent.mkdir(parents=True, exist_ok=True)
         self.max_previous_samples=max_previous_samples
         self.max_next_samples=max_next_samples
-        self.time_interval = 0.5 * 1e9  # 5ms间隔
+        self.time_interval = 0.5 * 1e9  # 5ms
 
     def process(self):
-        """主处理流程"""
         all_frames = []
         csv_files = self.find_csv_files()
         
@@ -38,15 +37,12 @@ class ArgoversePlanning:
         print(f"Processed {len(all_frames)} frames.")
 
     def find_csv_files(self):
-        """查找轨迹文件"""
         return sorted(self.base_dir.rglob("city_SE3_egovehicle.csv"))
 
     def get_scene_id(self, csv_file):
-        """获取场景ID"""
         return csv_file.parent.name
 
     def read_csv_data(self, csv_file):
-        """读取CSV数据"""
         df = pd.read_csv(csv_file)
         df['timestamp_ns'] = pd.to_datetime(
             df['timestamp_ns'], 
@@ -55,7 +51,6 @@ class ArgoversePlanning:
         return df.sort_values('timestamp_ns')
 
     def process_scene(self, df, scene_id):
-        """处理单个场景"""
         frames = []
         timestamps = df['timestamp_ns'].values
         num_samples = self.count_images(scene_id)
@@ -83,12 +78,10 @@ class ArgoversePlanning:
         return frames
 
     def count_images(self, scene_id):
-        """统计图片数量"""
         img_dir = self.base_dir / scene_id / "sensors" / "cameras" / "ring_front_center"
         return len(list(img_dir.glob("*")))
 
     def generate_target_times(self, start_time, num_samples):
-        """生成目标时间序列"""
         return np.linspace(
             start_time, 
             start_time + (num_samples-1)*self.time_interval,
@@ -96,7 +89,6 @@ class ArgoversePlanning:
         )
 
     def align_timestamps(self, timestamps, targets):
-        """时间戳对齐"""
         indices = []
         for t in targets:
             idx = np.searchsorted(timestamps, t, side="left")

@@ -23,7 +23,6 @@ class PromptKittiPlanning:
         
 
     def process(self):
-        """主处理流程"""
         for input_dir, output_file in zip(self.input_path, self.output_path):
             print(f"正在处理目录: {input_dir}")
             txt_files = sorted([os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith('.txt')])

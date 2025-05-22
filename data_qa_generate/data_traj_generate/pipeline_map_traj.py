@@ -26,7 +26,6 @@ class MapillarySLSProcessor:
         self.rotation_cache = {}
 
     def process(self):
-        """主处理流程"""
         all_frames = []
         city_dirs = sorted([d for d in self.base_dir.iterdir() if d.is_dir()], key=lambda x: x.name)
         
@@ -40,7 +39,6 @@ class MapillarySLSProcessor:
         print(f"处理完成，总帧数：{len(all_frames)}")
 
     def process_city(self, city_dir):
-        """处理单个城市"""
         frames = []
         print(f"正在处理城市: {city_dir.name}")
         try:

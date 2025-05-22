@@ -1,8 +1,3 @@
-"""
-@file   参考waymo_parse_tfrecord_main.py这个代码读取数据
-@brief  Waymo自车坐标系处理器 (支持轨迹差分计算)
-"""
-
 import os
 import sys
 import numpy as np
@@ -26,7 +21,6 @@ raw_hz=10
 step_by_hz=raw_hz//2
 
 class PipelineProcessor:
-    """处理整个数据管道"""
     def __init__(self, input_paths, output_paths, max_prev=5, max_next=6, workers=4):
 
         if len(output_paths) != 1:
