@@ -28,16 +28,13 @@ def point_to_line_distance(points):
     if len(points) < 3:
         raise ValueError("至少需要三个点")
     
-    # 转换为NumPy数组并提取坐标
     points = np.asarray(points)
     (x1, y1), (x2, y2), (xn, yn) = points[0], points[1], points[-1]
     
-    # 计算直线方程 Ax + By + C = 0 的参数
     A = y2 - y1
     B = x1 - x2
     C = x2 * y1 - x1 * y2
-    
-    # 计算距离（避免显式除以零）
+
     numerator = np.abs(A * xn + B * yn + C)
     denominator = np.sqrt(A**2 + B**2)
     distance = numerator / denominator if denominator > 1e-10 else 0.0
@@ -63,7 +60,6 @@ def point_to_line_projection_distance(points):
 
 
 def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_diff_thresh=3.0, val_stop=2.0, lat_thresh=2, angle_thresh=20.0,angle_thresh_navi=8.0, data_fps = 2, target_fps = 2):
-    # 已经在get_info中得到2hz的了,所以不用在这个函数中实现了
     if raw_poses is None or len(raw_poses) == 0:
         return [], [], []
     
@@ -71,7 +67,7 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
     interval = max(interval, 1)
     raw_xy = np.array([pose for pose in raw_poses])[::interval]
     
-    # 计算速度
+
     if len(raw_xy) <= 1:
         speeds = np.zeros(len(raw_xy))
     else:
@@ -79,8 +75,7 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
         distances = np.sqrt(np.sum(xy_diffs**2, axis=1))
         speeds = distances * target_fps
         speeds = np.append(speeds, speeds[-1]) if len(speeds) > 0 else np.zeros(1)
-    
-    # 生成速度计划
+
     speed_plans = []
     if len(speeds) > num_fut:
         speeds_diff = speeds[num_fut:] - speeds[:-num_fut]
@@ -93,22 +88,21 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
                 speed_plans.append("decelerate")
             else:
                 speed_plans.append("const")
-        # 填充到与speeds相同长度
+
         pad_length = len(speeds) - len(speed_plans)
         
         speed_plans += [speed_plans[-1]] * pad_length
        
     else:
-        # 数据不足时基于当前速度判断
         for speed in speeds:
             if speed < val_stop:
                 speed_plans.append("stop")
             else:
                 speed_plans.append("const")
     
-    # 生成路径计划
+
     path_plans = []
-    required_points = num_fut + 1  # 需要足够点计算起始和结束角度
+    required_points = num_fut + 1  
     if len(raw_xy) >= required_points:
         for i in range(len(raw_xy) - num_fut):
             xys = raw_xy[i:i + num_fut]
@@ -135,19 +129,19 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
                 else:
                     path_plan = "straight"
             path_plans.append(path_plan)
-        # 填充到与raw_xy相同长度
+
         pad_length = len(raw_xy) - len(path_plans)
         if path_plans:
             path_plans += [path_plans[-1]] * pad_length
         else:
             path_plans = ["straight"] * len(raw_xy)
     else:
-        # 数据不足时默认直行
+   
         path_plans = ["straight"] * len(raw_xy)
     
        # navigation
     navi_commands = []
-    if len(raw_xy) >= num_fut_navi + 1:  # 需要有足够点计算起始和结束角度
+    if len(raw_xy) >= num_fut_navi + 1: 
         for i in range(len(raw_xy) - num_fut_navi):
             xys = raw_xy[i:i + num_fut]
             start_angle = cal_angel(xys[1][0] - xys[0][0], xys[1][1] - xys[0][1])
@@ -170,17 +164,15 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
                 navi_command = 'go straight'
             navi_commands.append(navi_command)
         
-        # 填充到与raw_xy相同长度
-        if navi_commands:  # 确保navi_commands不为空
+        if navi_commands: 
             pad_length = len(raw_xy) - len(navi_commands)
             navi_commands += [navi_commands[-1]] * pad_length
         else:
             navi_commands = ["go straight"] * len(raw_xy)
-    else:
-        # 数据不足时默认直行
+    else:      
         navi_commands = ["const"] * len(raw_xy)
 
-    # 确保长度一致
+   
     assert len(speeds) == len(speed_plans) == len(path_plans)==len(navi_commands)
     return speeds.tolist() if isinstance(speeds, np.ndarray) else speeds, speed_plans, path_plans,navi_commands    
            
@@ -278,13 +270,6 @@ def q6(images, infos):
         qas.append({"images": images[i], "messages": [{"role":"user", "content": question}, {"role":"assistant", "content": answer}]})
     return qas
 def convert_latlon_to_utm(lons, lats, epsg_target="EPSG:32644"):
-    """
-    将经纬度数组转换为UTM坐标。
-    :param lons: 经度数组
-    :param lats: 纬度数组
-    :param epsg_target: 目标坐标系，此处默认为UTM Zone 44N
-    :return: (eastings, northings)
-    """
     transformer = Transformer.from_crs("EPSG:4326", epsg_target, always_xy=True)
     eastings, northings = transformer.transform(lons, lats)
     return eastings, northings
@@ -292,10 +277,10 @@ def convert_latlon_to_utm(lons, lats, epsg_target="EPSG:32644"):
 
 def plot_positions(positions, title, save_path):
     """Helper function to plot positions with start and end points marked"""
-    if len(positions) == 0:  # 直接检查数组是否为空
+    if len(positions) == 0:  
         x, y = [], []
     else:
-        x, y = positions[:, 0], positions[:, 1]  # 直接提取 x, y 列
+        x, y = positions[:, 0], positions[:, 1]  
     
     plt.figure(figsize=(8, 8))
     plt.scatter(x, y, c=range(len(positions)), cmap='viridis', s=10)
@@ -328,19 +313,16 @@ def gen_info():
                 print(f"正在处理文件：{file_path}")
                 df = pd.read_csv(file_path)
 
-                # 利用经纬度数据解析得到UTM坐标（存储为 easting 和 northing 列）
                 lons = df['longitude'].values
                 lats = df['latitude'].values
                 eastings, northings = convert_latlon_to_utm(lons, lats)
                 df['easting'] = eastings
                 df['northing'] = northings
 
-                # 计算相对于文件第一个点的相对坐标
                 easting_ref, northing_ref = eastings[0], northings[0]
                 df['x_rel'] = df['easting'] - easting_ref
                 df['y_rel'] = df['northing'] - northing_ref
 
-                # 生成符合2Hz的索引序列（交替+8/+9）
                 indices = []
                 current = 0
                 add_eight = True
@@ -353,14 +335,12 @@ def gen_info():
                     current = next_current
                     add_eight = not add_eight
 
-                # 创建降采样子集
-                df_subset = df.loc[indices].reset_index(drop=True)  # 重置索引保证连续
+ 
+                df_subset = df.loc[indices].reset_index(drop=True) 
                 traj = df_subset[['easting', 'northing']].values
 
-                # 准备保存路径和标题
                 # save_path = Path(IMAGE_OUTPUT_DIR) / f"{sub_dir}_{dataset_type}_trajectory50.png"
                 # title = f"Trajectory for {sub_dir}/{dataset_type}"
-                # # 调用 plot_positions
                 # plot_positions(traj[:50], title, save_path)
 
                 speeds, speed_plans, path_plans,navi_commands = get_plan(traj)
@@ -383,7 +363,6 @@ def gen_qa(qa_root):
             print(f"正在处理文件：{file_path}")
             df = pd.read_csv(file_path)
 
-            # 生成符合2Hz的索引序列（交替+8/+9）
             indices = []
             current = 0
             add_eight = True
@@ -395,8 +374,8 @@ def gen_qa(qa_root):
                     break
                 current = next_current
                 add_eight = not add_eight
-            # 创建降采样子集
-            df_subset = df.loc[indices].reset_index(drop=True)  # 重置索引保证连续
+
+            df_subset = df.loc[indices].reset_index(drop=True) 
             
             image_idx_list = df_subset['image_idx'].tolist()
             # print(image_idx_list)
@@ -415,8 +394,6 @@ def gen_qa(qa_root):
                 for img in image_idx_list
             ]        
         
-
-
             q3s += q3(images, ego)
             q4s += q4(images)
             q5s += q5(images)

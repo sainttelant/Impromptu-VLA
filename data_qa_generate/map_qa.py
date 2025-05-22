@@ -21,16 +21,14 @@ def point_to_line_distance(points):
     if len(points) < 3:
         raise ValueError("至少需要三个点")
     
-    # 转换为NumPy数组并提取坐标
+
     points = np.asarray(points)
     (x1, y1), (x2, y2), (xn, yn) = points[0], points[1], points[-1]
     
-    # 计算直线方程 Ax + By + C = 0 的参数
     A = y2 - y1
     B = x1 - x2
     C = x2 * y1 - x1 * y2
-    
-    # 计算距离（避免显式除以零）
+
     numerator = np.abs(A * xn + B * yn + C)
     denominator = np.sqrt(A**2 + B**2)
     distance = numerator / denominator if denominator > 1e-10 else 0.0
@@ -65,7 +63,7 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
     interval = max(interval, 1)
     raw_xy = np.array([pose for pose in raw_poses])[::interval]
     
-    # 计算速度
+
     if len(raw_xy) <= 1:
         speeds = np.zeros(len(raw_xy))
     else:
@@ -74,7 +72,7 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
         speeds = distances * target_fps
         speeds = np.append(speeds, speeds[-1]) if len(speeds) > 0 else np.zeros(1)
     
-    # 生成速度计划
+
     speed_plans = []
     if len(speeds) > num_fut:
         speeds_diff = speeds[num_fut:] - speeds[:-num_fut]
@@ -87,22 +85,21 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
                 speed_plans.append("decelerate")
             else:
                 speed_plans.append("const")
-        # 填充到与speeds相同长度
+
         pad_length = len(speeds) - len(speed_plans)
         
         speed_plans += [speed_plans[-1]] * pad_length
        
     else:
-        # 数据不足时基于当前速度判断
         for speed in speeds:
             if speed < val_stop:
                 speed_plans.append("stop")
             else:
                 speed_plans.append("const")
     
-    # 生成路径计划
+
     path_plans = []
-    required_points = num_fut + 1  # 需要足够点计算起始和结束角度
+    required_points = num_fut + 1
     if len(raw_xy) >= required_points:
         for i in range(len(raw_xy) - num_fut):
             xys = raw_xy[i:i + num_fut]
@@ -129,19 +126,19 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
                 else:
                     path_plan = "straight"
             path_plans.append(path_plan)
-        # 填充到与raw_xy相同长度
+
         pad_length = len(raw_xy) - len(path_plans)
         if path_plans:
             path_plans += [path_plans[-1]] * pad_length
         else:
             path_plans = ["straight"] * len(raw_xy)
     else:
-        # 数据不足时默认直行
+       
         path_plans = ["straight"] * len(raw_xy)
     
     # navigation
     navi_commands = []
-    if len(raw_xy) >= num_fut_navi + 1:  # 需要有足够点计算起始和结束角度
+    if len(raw_xy) >= num_fut_navi + 1: 
         for i in range(len(raw_xy) - num_fut_navi):
             xys = raw_xy[i: i + num_fut_navi]
             start_angle = cal_angel(xys[1][0] - xys[0][0], xys[1][1] - xys[0][1])
@@ -162,16 +159,13 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
                 navi_command = 'go straight'
             navi_commands.append(navi_command)
         
-        # 填充到与raw_xy相同长度
-        if navi_commands:  # 确保navi_commands不为空
+        if navi_commands:  
             pad_length = len(raw_xy) - len(navi_commands)
             navi_commands += [navi_commands[-1]] * pad_length
         else:
             navi_commands = ["go straight"] * len(raw_xy)
     else:
-        # 数据不足时默认
         navi_commands = ["go straight"] * len(raw_xy)
-      # 确保长度一致
     assert len(speeds) == len(speed_plans) == len(path_plans)==len(navi_commands)
     return speeds.tolist() if isinstance(speeds, np.ndarray) else speeds, speed_plans, path_plans,navi_commands    
           
@@ -278,12 +272,12 @@ def gen_info(root):
             if not type_path.exists():
                 print(f"跳过: {city_dir.name}/{type_dir} 不存在")
                 continue
-            # 读取并合并数据
+
             try:
                 post_df = pd.read_csv(city_dir / type_dir / "postprocessed.csv")
-                # 继续处理 post_df
+ 
             except FileNotFoundError:
-                continue  # 跳过不存在的文件
+                continue  
             seq_df = pd.read_csv(city_dir / type_dir / "seq_info.csv")
             raw_df = pd.read_csv(city_dir / type_dir / "raw.csv")
             merged_df = pd.merge(post_df, seq_df, on='key')
@@ -316,7 +310,7 @@ def gen_info(root):
                     start_frame = sub_group.iloc[0]['frame_number']
                     scene_id = f"{seq_key}-{start_frame}"
 
-                    # 对比计算角度
+
                     traj_enu = sub_group[['easting', 'northing']].values  
 
                     speeds, speed_plans, path_plans,navi_commands = get_plan(traj_enu)
@@ -341,12 +335,12 @@ def gen_qa(root, qa_root):
             if not type_path.exists():
                 print(f"跳过: {city_dir.name}/{type_dir} 不存在")
                 continue
-            # 读取并合并数据
+
             try:
                 post_df = pd.read_csv(city_dir / type_dir / "postprocessed.csv")
-                # 继续处理 post_df
+
             except FileNotFoundError:
-                continue  # 跳过不存在的文件
+                continue  
             seq_df = pd.read_csv(city_dir / type_dir / "seq_info.csv")
             raw_df = pd.read_csv(city_dir / type_dir / "raw.csv")
             merged_df = pd.merge(post_df, seq_df, on='key')
@@ -396,12 +390,12 @@ def gen_qa(root, qa_root):
                             continue  # Skip if directory doesn't exist
                     # print(len(file_list['camera_FRONT']))
                     # print(len(ego))
-                    # 检查 'camera_FRONT' 是否存在，再比较长度
+
                     if 'camera_FRONT' not in file_list or len(file_list['camera_FRONT']) != len(ego):
                         print(f"跳过 {scene_id}：图片数量 {len(file_list.get('camera_FRONT', []))} 不等于 ego 数据长度 {len(ego)}")
                         continue
                     images = [[file_list[key][i] for key in views] for i in range(len(ego))]
-                    # 因为都是2hz,所以可以直接len
+
                             
             if images==[]:
                 continue

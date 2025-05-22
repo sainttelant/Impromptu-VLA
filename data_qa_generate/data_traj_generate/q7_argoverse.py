@@ -55,7 +55,6 @@ def fps(traj_f):
     as_prompt = ", ".join([f"[{traj_f[i][0]:.2f}, {traj_f[i][1]:.2f}]" for i in range(10)])
     return as_prompt
 
-# 循环处理每个split
 for sp, pt, ft in zip(splits, pasts, futures):
     results = []
     pts = []

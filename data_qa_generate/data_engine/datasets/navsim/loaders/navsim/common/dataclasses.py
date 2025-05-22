@@ -24,8 +24,8 @@ from data_engine.datasets.navsim.loaders.navsim.planning.simulation.planner.pdm_
 )
 
 NAVSIM_INTERVAL_LENGTH: float = 0.5
-OPENSCENE_DATA_ROOT = "/baai-cwm-1/baai_cwm_ml/public_data/scenes/navsim"
-NUPLAN_MAPS_ROOT = "/baai-cwm-1/baai_cwm_ml/public_data/scenes/navsim/maps"
+
+NUPLAN_MAPS_ROOT = "your root/navsim/maps"
 
 
 @dataclass

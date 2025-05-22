@@ -59,7 +59,6 @@ def point_to_line_projection_distance(points):
      
 def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_diff_thresh=3.0, val_stop=2.0, lat_thresh=1.0, angle_thresh=5.0,angle_thresh_navi=8.0, data_fps = 10, target_fps = 2):
     interval = int(data_fps / target_fps)
-    # 改为了这个pose[:2]
     raw_xy = np.array([pose[:2] for pose in raw_poses])[::interval]
     # raw_xy = np.array([pose[:2,3] for pose in raw_poses])[::interval]
     # print(raw_xy)
@@ -82,7 +81,7 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
             speed_plans.append("const")
     speed_plans += [speed_plans[-1]] * num_fut
     
-    # 提取横向位置和纵向位置
+
     path_plans = []
     for i in range(len(raw_xy) - num_fut):
         xys = raw_xy[i: i + num_fut]
@@ -92,7 +91,6 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
         # print(angle_diff)
         dis = point_to_line_distance(xys)
         path_plan = "straight"
-        # 判断是否进行变道或转弯
         if dis<lat_thresh/2:
             path_plan = "straight"
         elif angle_diff <= -angle_thresh:
@@ -235,7 +233,7 @@ def gen_info(root):
 
     for sp in ["training", "testing"]:
             for seq in tqdm(os.listdir(f"{root}/{sp}/oxts")):
-                if seq.endswith('.txt'):  # 只处理以.txt结尾的文件
+                if seq.endswith('.txt'): 
                     file_path = f"{root}/{sp}/oxts/{seq}"
                     # print(file_path)
                     # quit()
@@ -256,7 +254,7 @@ def gen_qa(data_root, qa_root,data_fps = 10, target_fps = 2):
         q5s = []
         q6s = []
         for seq in tqdm(sorted(os.listdir(f"{data_root}/{sp}/oxts"))):
-            if seq.endswith('.txt'):  # 只处理以.txt结尾的文件
+            if seq.endswith('.txt'):  
                 seq_name = os.path.splitext(seq)[0]
                 with open(f'{data_root}/{sp}/oxts/{seq_name}_ego_results.json', "r") as f:
                     ego = json.load(f)

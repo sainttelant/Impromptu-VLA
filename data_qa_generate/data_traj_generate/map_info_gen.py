@@ -16,7 +16,6 @@ for city in sorted(os.listdir(root)):
         if os.path.exists(csv_path):
             df = pd.read_csv(csv_path)
             for seq_key, seq_group in df.groupby('sequence_key'):
-                # 按帧号排序并分割子场景
                 sorted_group = seq_group.sort_values('frame_number')
                 sub_scenes = []
                 current_scene = []
@@ -38,7 +37,6 @@ for city in sorted(os.listdir(root)):
                     sub_scenes.append(current_scene)
                 
                 scene_res = []
-                # 处理每个子场景
                 for scene in sub_scenes:
                     start_frame = scene[0]['frame_number']
                     n_frame = len(scene)

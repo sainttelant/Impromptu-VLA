@@ -3,7 +3,6 @@
 @brief  Waymo自车坐标系处理器 (支持轨迹差分计算)
 """
 
-# 一个场景一个夹
 import os
 import sys
 import numpy as np
@@ -40,66 +39,53 @@ class PipelineProcessor:
         self.workers = workers
 
     def _parse_frame(self, data):
-        """解析帧数据"""
         frame = dataset_pb2.Frame()
         frame.ParseFromString(bytearray(data.numpy()))
         return frame
 
     def _format_coordinates(self, coord_list):
-        """格式化坐标，保留两位小数"""
         return [round(coord, 2) for coord in coord_list]
 
     def _process_single_file(self, input_path):
-        """处理单个文件,这个版本是生成前三个和后十个相对，x前，y左"""
         dataset = tf.data.TFRecordDataset(input_path, compression_type='')
         all_frames = [self._parse_frame(data) for data in dataset]
         
-        # 采样频率
         step_by_hz = 5
         indices = [i for i in range(0, len(all_frames), step_by_hz)]
         subsscene_data = [all_frames[i] for i in indices]
         
         seq = input_path.split("/")[-1].split(".")[0]
-        
-        # 获取位姿信息
         raw_poses = [np.array(frame.pose.transform).reshape(4, 4).astype(np.float32) for frame in subsscene_data]
         re_poses = [np.linalg.inv(raw_pose) for raw_pose in raw_poses]
         
-        # 保存该序列的所有相对位姿
         sequence_data = {
             "sequence_id": seq,
             "num_frames": len(raw_poses),
             "relative_poses": {}
         }
         
-        # 对于每一帧，计算其相对于前3帧和后10帧的相对位姿
+
         for j in range(len(raw_poses)):
             sequence_data["relative_poses"][str(j)] = {}
-            
-            # 前3帧
             for i in range(max(0, j-3), j):
                 rel_pose = re_poses[j] @ raw_poses[i]
                 sequence_data["relative_poses"][str(j)][f"prev_{j-i}"] = self._format_coordinates(rel_pose[:2, 3].tolist())
-            
-            # 后10帧
+
             for i in range(j+1, min(len(raw_poses), j+11)):
                 rel_pose = re_poses[j] @ raw_poses[i]
                 sequence_data["relative_poses"][str(j)][f"next_{i-j}"] = self._format_coordinates(rel_pose[:2, 3].tolist())
-        
         return sequence_data
 
 
     def execute(self):
-        """执行处理流程"""
         with open(self.output_path, 'w') as f:
             with ThreadPoolExecutor(max_workers=self.workers) as executor:
                 futures = [executor.submit(self._process_single_file, path) for path in self.input_paths]
                 for future in tqdm(futures, desc="Processing files"):
                     json.dump(future.result(), f)
-                    f.write('\n')  # 每行一个JSON对象
+                    f.write('\n') 
 
     def _convert_to_json_serializable(self, data):
-        """数据类型转换"""
         if isinstance(data, np.ndarray):
             return data.tolist()
         elif isinstance(data, (list, tuple)):

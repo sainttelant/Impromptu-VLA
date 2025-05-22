@@ -9,7 +9,7 @@ project_root = script_path.parent.parent.parent
 data_dir = project_root / "data_raw" / "Argoverse-V2-sensor"
 modes = ['test', 'val', 'train']
      
-# frame中的tx,ty,tz是ENU的
+# tx,ty,tz is ENU
 class ArgoversePlanning:
     def __init__(self,max_previous_samples,max_next_samples,output_file,mode):
         self.mode = mode
@@ -112,54 +112,45 @@ class ArgoversePlanning:
         return sorted(list(set(indices)))
 
     def get_rotation_matrix(self, frame_data):
-        """构造旋转矩阵"""
         qw, qx, qy, qz = frame_data[['qw','qx','qy','qz']]
+        # ego-》ENU
         return np.array([
             [1 - 2*(qy**2 + qz**2), 2*(qx*qy - qw*qz), 2*(qx*qz + qw*qy)],
             [2*(qx*qy + qw*qz), 1 - 2*(qx**2 + qz**2), 2*(qy*qz - qw*qx)],
             [2*(qx*qz - qw*qy), 2*(qy*qz + qw*qx), 1 - 2*(qx**2 + qy**2)]
-        ]).T  # 直接返回转置矩阵(frame中的四元数是自车-》ENU的)
+        ]).T  
 
     def get_df_trajectory(self, df, center_idx, R):
-        """获取滑动窗口轨迹"""
         start = max(0, center_idx - self.max_previous_samples-1)
         end = min(len(df), center_idx + self.max_next_samples + 1)
-        # 需要转换到自车坐标系（正x是向右，正y是向前）
+        # Needs to be transformed to the ego vehicle's coordinate system (positive x is right, positive y is forward)  
         trajectory = [
             (R @ np.array([row.tx_m, row.ty_m, row.tz_m]))[:2] 
             for row in df.iloc[start:end].itertuples()
         ]
 
-        """计算差分轨迹"""
-        # 如果轨迹长度小于 2，直接返回零差分
         if len(trajectory) < 2:
             return np.array([0, 0]).tolist(),np.array([0, 0]).tolist()
         
-        # 使用 NumPy 计算差分
-        trajectory = np.array(trajectory)  # 确保输入为 NumPy 数组
+        trajectory = np.array(trajectory)  
         disp_trajectory = np.diff(trajectory, axis=0)
         
-        # 如果 start_idx 为 0，在第一帧前补零
         if start == 0:
             disp_trajectory = np.vstack(([0, 0], disp_trajectory))
 
-        # 交换 x 和 y，并将 y 取反
-        disp_trajectory = disp_trajectory[:, [1, 0]]  # 交换 x 和 y
-        disp_trajectory[:, 0] = -disp_trajectory[:, 0]  # 将新的 x（原来的 y）取反。
+        disp_trajectory = disp_trajectory[:, [1, 0]]  
+        disp_trajectory[:, 0] = -disp_trajectory[:, 0] 
         
         return disp_trajectory.tolist()
 
     def get_trajectory(self, df, center_idx, R):
-        """获取滑动窗口轨迹（新坐标系下，且相对于中心点）"""
         start = max(0, center_idx - self.max_previous_samples)
         end = min(len(df), center_idx + self.max_next_samples + 1)
         
-        # 获取中心点在新坐标系下的坐标
         center_row = df.iloc[center_idx]
         vec_center = R @ np.array([center_row.tx_m, center_row.ty_m, center_row.tz_m])
-        center_x, center_y = vec_center[1], vec_center[0]  # 新坐标系下的中心坐标
-        
-        # 生成轨迹并转换为相对于中心点的坐标
+        center_x, center_y = vec_center[1], vec_center[0] 
+
         trajectory = [
             (vec[0] - center_y, vec[1] - center_x)  
             for row in df.iloc[start:end].itertuples()
@@ -184,7 +175,6 @@ class ArgoversePlanning:
         
 
     def build_pose(self, frame_data, R):
-        """构建pose信息"""
         vehicle_pos = R @ np.array([frame_data.tx_m, frame_data.ty_m, frame_data.tz_m])
         return [
             frame_data.qw, frame_data.qx,
@@ -193,7 +183,6 @@ class ArgoversePlanning:
         ]
 
     def save_results(self, data):
-        """保存结果"""
         with open(self.output_file, 'w') as f:
             for entry in data:
                 json.dump(entry, f)

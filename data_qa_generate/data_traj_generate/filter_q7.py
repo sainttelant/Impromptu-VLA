@@ -9,7 +9,6 @@ root_dir = f"{project_root}/data_qa_results"
 output_disabled = f"{project_root}/data_qa_generate/data_traj_generate/data_traj_results/q7_filter_disabled.jsonl"
     
 def parse_trajectory(content: str) -> List[Tuple[float, float]]:
-    """从assistant的content中解析轨迹坐标"""
     pattern = r'\[([^\]]+)\]'
     matches = re.findall(pattern, content)
     traj = []
@@ -31,7 +30,6 @@ def parse_trajectory(content: str) -> List[Tuple[float, float]]:
     return traj[:10]
 
 def process_json_file(file_path: str, output_disabled: str):
-    """处理单个JSON文件，过滤并输出不符合条件的记录"""
     with open(file_path, 'r', encoding='utf-8') as f:
         try:
             data = json.load(f)

@@ -13,7 +13,6 @@ data_root = project_root / "data_raw" / "Argoverse-V2-sensor"
 qa_root = project_root / "data_qa_results" / "argoverse"
 os.makedirs(qa_root, exist_ok=True)
 
-# 判断车辆在自车的什么位置 （前面、左前、右前、左后、右后、后面）
 def get_obj_rel_position(frame):
     # nuscenes camera fov: 70 (except rear cam: 110)
     x, y = frame.tx_m, frame.ty_m
@@ -97,7 +96,6 @@ def get_plan(df, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_diff_thr
             speed_plans.append("const")
     speed_plans += [speed_plans[-1]] * num_fut
     
-    # 提取横向位置和纵向位置
     path_plans = []
     for i in range(len(raw_xy) - num_fut):
         xys = raw_xy[i: i + num_fut]
@@ -108,7 +106,6 @@ def get_plan(df, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_diff_thr
         dis = point_to_line_distance(xys)
         dis_forward=point_to_line_projection_distance(xys)
         path_plan = "straight"
-        # 判断是否进行变道或转弯
         if dis<lat_thresh:
             path_plan = "straight"
         elif angle_diff <= -angle_thresh:
@@ -127,14 +124,13 @@ def get_plan(df, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_diff_thr
     
      # navigation
     navi_commands = []
-    if len(raw_xy) >= num_fut_navi + 1:  # 需要有足够点计算起始和结束角度
+    if len(raw_xy) >= num_fut_navi + 1: 
         for i in range(len(raw_xy) - num_fut_navi):
             xys = raw_xy[i: i + num_fut_navi]
             start_angle = cal_angel(xys[1][0] - xys[0][0], xys[1][1] - xys[0][1])
             end_angle = cal_angel(xys[-1][0] - xys[-2][0], xys[-1][1] - xys[-2][1])
             angle_diff = end_angle - start_angle
             dis = point_to_line_distance(xys)
-            # dis取了绝对值,都为正
             dis_forward=point_to_line_projection_distance(xys)
 
             if dis_forward >= 20.0 and dis >= 10.0 and angle_diff>0:
@@ -149,16 +145,14 @@ def get_plan(df, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_diff_thr
                 navi_command = 'go straight'
             navi_commands.append(navi_command)
         
-        # 填充到与raw_xy相同长度
-        if navi_commands:  # 确保navi_commands不为空
+     
+        if navi_commands:  
             pad_length = len(raw_xy) - len(navi_commands)
             navi_commands += [navi_commands[-1]] * pad_length
         else:
             navi_commands = ["go straight"] * len(raw_xy)
     else:
-        # 数据不足时默认
         navi_commands = ["go straight"] * len(raw_xy)
-      # 确保长度一致
     assert len(speeds) == len(speed_plans) == len(path_plans)==len(navi_commands)
     return speeds.tolist() if isinstance(speeds, np.ndarray) else speeds, speed_plans, path_plans,navi_commands    
 
@@ -241,7 +235,6 @@ def gen_info(root, file_list = False):
                 with open(f"{root}/{sp}/{seq}/file_list.json", "w") as f:
                     json.dump(selected_files, f)
             
-            # # 示例：读取文件并打印数据
             speeds, speed_plans, path_plans,navi_commands = get_plan(df0_subset)
             results = [(float(speed), sp, pp,nc) for speed, sp, pp,nc in zip(speeds, speed_plans, path_plans,navi_commands)]
             with open(f"{root}/{sp}/{seq}/ego_results.json", "w") as f:

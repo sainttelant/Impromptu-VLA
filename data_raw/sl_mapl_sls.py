@@ -1,4 +1,4 @@
-# 需要先对mapl_sls数据集进行软连接处理，代码中使用的是带软连接的数据，而且组织有序，更加方便查看场景序列
+# The mapl_sls dataset needs to be soft-linked first. The code uses the soft-linked data, which is well-organized and makes it easier to view scene sequences.
 import os
 import pandas as pd
 from pathlib import Path

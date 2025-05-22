@@ -80,17 +80,16 @@ def get_plan(raw_poses, num_fut=4, num_fut_navi=12, vel_navi_thresh=4.0, vel_dif
             speed_plans.append("const")
     speed_plans += [speed_plans[-1]] * num_fut
 
-    # 提取横向位置和纵向位置
+
     path_plans = []
     for i in range(len(raw_xy) - num_fut):
         xys = raw_xy[i: i + num_fut]
         start_angle = cal_angel(xys[1][0] - xys[0][0], xys[1][1] - xys[0][1])
         end_angle = cal_angel(xys[-1][0] - xys[-2][0], xys[-1][1] - xys[-2][1])
         angle_diff = end_angle - start_angle
-        # print(angle_diff)
         dis = point_to_line_distance(xys)
         path_plan = "straight"
-        # 判断是否进行变道或转弯
+
         if dis < lat_thresh:
             path_plan = "straight"
         elif angle_diff <= -angle_thresh:
@@ -179,7 +178,6 @@ def q3(images, infos):
             decision = pedal_decision[pedal_status[speed_plan]] + \
                 ' and ' + path_decision[path_status[path_plan]]
 
-        # 获取当前时间步的所有视角和路径
 
         current_step = images[i]
         view_names = list(current_step.keys())
@@ -187,13 +185,12 @@ def q3(images, infos):
         image_prompt = ""
 
         for view in view_names:
-            # 生成友好的视角名称（如 "ring_front_center" → "Front Center"）
             formatted_view = view.replace(
                 "ring_", "").replace("_", " ").title()
             image_prompt += f"<{formatted_view}>:\n<image>\n"
             image_paths.append(current_step[view])
 
-        # 构建问题
+
         question = image_prompt + "You are driving, " \
             f"your current speed is {int(speed)} m/s, " \
             f"and the navigation command is {navigation_command} " \
@@ -216,10 +213,9 @@ def q4(images):
     qas = []
     question = "Given the provided forward-facing image <image> from a car's perspective, identify if there is a traffic light that affects the car's behavior. Respond with 'Red', 'Green', 'Yellow', or 'None'."
     for step in images:
-        # 使用 front center 视角的图片路径
         front_center_path = step.get("ring_front_center", "")
         if not front_center_path:
-            continue  # 跳过缺失的视角
+            continue 
         qas.append({
             "images": [front_center_path],
             "messages": [
@@ -232,7 +228,6 @@ def q4(images):
 
 def q5(images):
     qas = []
-    # 明确指定需要的视角键名（例如 front center）
     required_views = [
         "ring_front_left",          # cam01
         "ring_front_center",        # cam03
@@ -245,12 +240,11 @@ def q5(images):
 
     for step in images:
         for view_name in required_views:
-            # 获取对应的图片路径
+
             image_path = step.get(view_name, "")
             if not image_path:
-                continue  # 跳过缺失的视角
+                continue  
 
-            # 生成问题描述（根据视角名称调整描述）
             view_desc = view_name.replace(
                 "ring_", "").replace("_", " ").title()
             question = "Suppose you are driving, and I'm providing you with the image " \
@@ -278,21 +272,19 @@ def q6(images, infos):
     for i, info in enumerate(infos):
         speed, speed_plan, path_plan, navigation_command = info
 
-        # 获取当前时间步的所有视角和路径
-
         current_step = images[i]
         view_names = list(current_step.keys())
         image_paths = []
         image_prompt = ""
 
         for view in view_names:
-            # 生成友好的视角名称（如 "ring_front_center" → "Front Center"）
+            # （ "ring_front_center" → "Front Center"）
             formatted_view = view.replace(
                 "ring_", "").replace("_", " ").title()
             image_prompt += f"<{formatted_view}>:\n<image>\n"
             image_paths.append(current_step[view])
 
-        # 构建问题
+ 
         question = image_prompt + f"Your current speed is {int(speed)} m/s, the navigation command is {navigation_command}," \
             f" based on the understanding of the driving scene and the navigation information," \
             f"what is your plan for the next three seconds?" \
@@ -303,7 +295,7 @@ def q6(images, infos):
         # answer = f"My SPEED plan is {speed_plan},and my PATH plan is {path_plan}."
         answer = f"{pedal_status[speed_plan]},{path_status[path_plan]}"
         qas.append({
-            "images": image_paths,  # 传递所有视角的路径
+            "images": image_paths,  
             "messages": [
                 {"role": "user", "content": question},
                 {"role": "assistant", "content": answer}
@@ -366,12 +358,11 @@ def gen_qa(root, qa_root):
     q5s = []
     q6s = []
 
-    # 定义视角名称与cam编号的映射关系（假设views数组已正确填写）
     views = [
         "ring_front_left",          # cam01
-        "ring_front_right",         # cam02（实际不存在）
+        "ring_front_right",         # cam02（not exist actually）
         "ring_front_center",        # cam03
-        "ring_rear_left",           # cam04（实际不存在）
+        "ring_rear_left",           # cam04（not exist actually）
         "ring_side_left_front",     # cam05
         "ring_side_left_center",    # cam06
         "ring_side_right_front",    # cam07
@@ -389,13 +380,13 @@ def gen_qa(root, qa_root):
             print(f"路径 {seq_data_dir} 不存在，跳过当前循环。")
             continue
         # print(seq_data_dir)
-        # 收集所有视角的图片路径
+
         for cam_dir in os.listdir(seq_data_dir):
             # print(cam_dir)
             if not cam_dir.startswith("cam"):
                 continue
 
-            cam_number = cam_dir[3:]  # 提取cam编号（如"01"）
+            cam_number = cam_dir[3:]  
             # print(cam_number)
             try:
                 view_index = int(cam_number)  # cam01 → 1 → views[0]
@@ -416,25 +407,22 @@ def gen_qa(root, qa_root):
                     file_list[view_name] = []
                 file_list[view_name].append(img_path)
 
-        # 筛选有效视角（确保视角名称在views中且有图片）
         # pdb.set_trace()
         if 'ring_front_center' in file_list:
             valid_views = ['ring_front_center']
         else:
             continue
 
-        # # 计算最小图片数量（确保所有视角都有足够的图片）
         min_image_count = min(len(file_list[view]) for view in valid_views)
-        # 正常的话,len(file_list[view]应该都相等
         max_ego_length = min(len(ego), min_image_count)
         # print(len(ego))
         # print(min_image_count)
-        # 生成images，每个时间步保存视角名称与路径的映射
+
         images = []
         for i in range(max_ego_length):
             current_step = {}
             for view in valid_views:
-                current_step[view] = file_list[view][i]  # 保存视角名称和路径的键值对
+                current_step[view] = file_list[view][i] 
             images.append(current_step)
         # print(images)
         q3s += q3(images, ego[:max_ego_length])

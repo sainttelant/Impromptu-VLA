@@ -18,7 +18,6 @@ output_file_future.parent.mkdir(parents=True, exist_ok=True)
 
 class MapillarySLSProcessor:
     def __init__(self, max_previous_samples=0, max_next_samples=10, output_file=None,type_dir="query"):
-        # 配置路径参数
         self.base_dir = Path(data_dir)
         self.output_file = output_file
         self.type_dir = type_dir
@@ -51,9 +50,7 @@ class MapillarySLSProcessor:
         except Exception as e:
             print(f"加载数据失败: {str(e)}.导致无法得到这个城市的轨迹数据")
             return frames
-            # 按 sequence_key 分组处理
         for seq_key, seq_group in merged_df.groupby('sequence_key'):
-            # 按帧号排序并分割子场景
             sorted_group = seq_group.sort_values('frame_number')
             sub_scenes = []
             current_scene = []
@@ -74,22 +71,18 @@ class MapillarySLSProcessor:
             if current_scene:
                 sub_scenes.append(current_scene)
 
-            # 处理每个子场景
             for sub_scene in sub_scenes:
                 if not sub_scene:
                     continue
-                
-                # 生成场景ID
+
                 start_frame = sub_scene[0]['frame_number']
                 scene_id = f"{seq_key}-{start_frame}"
 
-                # 处理每个样本
                 sub_scene_df = pd.DataFrame(sub_scene)
                 traj_raw = sub_scene_df[['easting', 'northing']].values   
                 try:
                     self.compute_traj_to_thetas(traj_raw)
                     # print(self.rotation_cache)
-                    # 角度存在骤变不合理的情况
                 except Exception as e:
                     print(f"预计算旋转矩阵失败: {str(e)}")
                     continue
@@ -97,7 +90,7 @@ class MapillarySLSProcessor:
                 for idx, (_, row) in enumerate(sub_scene.iterrows()):
                     try:
                         frame_data = self.process_frame(row, sub_scene, idx, seq_key, scene_id,city_dir)
-                        if frame_data:  # 只有当frame_data不为None时才添加
+                        if frame_data:  
                             frames.append(frame_data)
                     except Exception as e:
                         print(f"处理帧失败: {str(e)}")
@@ -106,43 +99,35 @@ class MapillarySLSProcessor:
         return frames
 
     def process_frame(self, row, seq_group, idx, seq_key,scene_id,city_dir):
-        """处理单个帧"""
-        # 获取滑动窗口轨迹
         traj, diff_traj ,theta= self.get_trajectory(seq_group, idx, seq_key)
         traj = np.array(traj)
         traj = np.round(traj, 2).tolist()
 
         diff_traj = np.array(diff_traj)
         diff_traj = np.round(diff_traj, 2).tolist()
-         # 获取图片路径并添加.jpg后缀
         image_path = str(city_dir / self.type_dir / "images" / (row['key'] + '.jpg'))
         
         return {
             "scene_id": scene_id,
             "frame_id": idx,
-            "image_path": image_path,  # 包含.jpg后缀的图片路径
+            "image_path": image_path,  
             "trajectory": traj
         }
         
-    # --- 修改3：增加 self 和 traj 参数，并向量化计算 ---
+
     def compute_traj_to_thetas(self, traj):
-        """
-        traj: [N, 2]，ENU 坐标
-        返回: [N]，每个点对应的航向角（角度制），如果两点距离小于0.2则置0
-        """
         traj = np.array(traj)  # shape: (N, 2)
         N = len(traj)
         if N < 2:
             thetas = np.zeros(N)
             self.rotation_cache = thetas
             return thetas
-        # 计算相邻点的差分和距离
         diffs = np.diff(traj, axis=0)  # shape: (N-1, 2)
         dists = np.linalg.norm(diffs, axis=1)
-        # 计算角度（注意：atan2 返回的是弧度，转换为角度并减90度）
+        # Calculate the angle (Note: atan2 returns radians, convert to degrees and subtract 90 degrees)
         # angles = np.degrees(np.arctan2(diffs[:,1], diffs[:,0])) - 90
-        angles = np.degrees(np.arctan2(diffs[:,0], diffs[:,1])) # 参数顺序改为 (x, y),这样的话，是ENU，北0度，东90度
-        # 对距离小于0.2的点，将角度置0
+        angles = np.degrees(np.arctan2(diffs[:,0], diffs[:,1])) # Parameters ordered as (x, y) follow ENU convention (0°=North, 90°=East).
+
         angles[dists < 0.2] = 0
         thetas = np.empty(N)
         thetas[0] = angles[0]
@@ -151,36 +136,28 @@ class MapillarySLSProcessor:
         return thetas
 
     def get_trajectory(self, seq_group, center_idx, seq_key):
-        """获取滑动窗口轨迹（相对当前帧）"""
         theta = self.rotation_cache[center_idx]
-        # 将 theta 转换为弧度
         heading_radians = np.deg2rad(theta)  
-        
-        # 构造二维旋转矩阵
+
         R = np.array([
             [np.cos(heading_radians), -np.sin(heading_radians)],
             [np.sin(heading_radians), np.cos(heading_radians)]
         ])
 
         origin = seq_group.iloc[center_idx][['easting', 'northing']].values
-        
-        # 确定窗口范围
+
         start = max(0, center_idx - self.max_previous_samples)
         end = min(len(seq_group), center_idx + self.max_next_samples + 1)
-        
-        # --- 修改4：使用向量化计算转换后的轨迹 ---
+
         points = seq_group.iloc[start:end][['easting', 'northing']].values  # shape: (window, 2)
-        # 计算相对于原点的差值并做矩阵乘法（转置后再转置回来）
         transformed = (R @ (points - origin).T).T  # shape: (window, 2)
         trajectory = transformed.tolist()
-        
-        # --- 修改4：利用 numpy 计算差分轨迹 ---
+
         traj_array = np.array(trajectory)
         if len(traj_array) < 2:
             diff_traj = [[0.0, 0.0]]
         else:
             diff = np.diff(traj_array, axis=0)
-            # 如果窗口从0开始，第一帧补零
             if start == 0:
                 diff_traj = np.vstack(([0.0, 0.0], diff)).tolist()
             else:
@@ -202,7 +179,6 @@ class MapillarySLSProcessor:
         return trajectory
 
     def save_results(self, data):
-        """保存结果"""
         with open(self.output_file, 'w') as f:
             for entry in data:
                 json.dump(entry, f)

@@ -33,7 +33,7 @@ class OnceProcessor:
             try:
                 with open(file_path, 'r') as f:
                     file_data = json.load(f)
-                    file_data['scene_id'] = folder_name  # 添加 scene_id
+                    file_data['scene_id'] = folder_name 
                     data.append(file_data)
             except FileNotFoundError:
                 print(f"File {file_path} not found. Skipping.")
@@ -44,7 +44,6 @@ class OnceProcessor:
         return data
 
     def group_by_scene(self, data):
-        # 返回包含 scene_id 和 frames 的字典列表
         return [{'scene_id': entry['scene_id'], 'frames': entry.get('frames', [])} for entry in data]
 
     def process_groups(self, grouped_data):
@@ -64,99 +63,80 @@ class OnceProcessor:
                 "trajectory": traj,
             })
         return scene_traj
-
-# frames 里的 "pose" 数据是 相对于场景第一帧（初始帧）的激光雷达坐标系 进行定义的。
-# 激光雷达坐标系位于激光雷达传感器中心，x 轴正方向向左，y 轴正方向向后，z 轴正方向向上。
-# 所以先旋转到自车坐标系，再xy都取相反数就行（换坐标轴）
+# The "pose" data in frames is defined relative to the lidar coordinate system of the scene's first frame (initial frame).
+# The lidar coordinate system is located at the center of the lidar sensor, with:
+# - positive x-axis pointing left
+# - positive y-axis pointing backward 
+# - positive z-axis pointing upward
+# Therefore, first transform to the ego vehicle's coordinate system, then simply invert both x and y (axis conversion)
 
     def get_df_trajectory(self, frames, index,scene_id):
-        """
-        提取当前帧的前后轨迹，并转换到自车坐标系
-        :param frames: 包含所有帧数据的列表，每帧包含 'pose' 信息
-        :param index: 当前帧的索引
-        :return: 差分轨迹 (disp_trajectory)，形状为 (n, 2)
-        """
-        # 1. 确定轨迹的起始和结束索引
         start_idx = max(0, index - self.max_previous_samples-1)
         end_idx = min(len(frames), index + self.max_next_samples + 1)
 
-        # 2. 获取当前帧的参考位姿
         ref_pose = frames[index]['pose']
-        ref_translation = np.array(ref_pose[4:6])  # 提取 x, y
+        ref_translation = np.array(ref_pose[4:6]) 
 
-        # 检查四元数是否有效
         quat = ref_pose[:4]
         quat_norm = np.linalg.norm(quat)
-        if quat_norm < 1e-6:  # 如果模接近零，跳过该帧或使用默认值.的确有一些pose中的数据全为0000000，全静止
+        if quat_norm < 1e-6: 
             # print(f"Warning: Invalid quaternion (norm={quat_norm}) at frame {index}.scene{scene_id}. Using raw trajectory.")
             use_rotation = False
         else:
             use_rotation = True
-            ref_rotation = R.from_quat(quat).as_matrix()[:2, :2]  # 提取旋转矩阵的前两行
+            ref_rotation = R.from_quat(quat).as_matrix()[:2, :2]  
 
-        # 3. 提取轨迹并转换到自车坐标系（如果需要）
         trajectory = []
         for i in range(start_idx, end_idx):
             pose = frames[i]['pose']
-            trans = np.array(pose[4:6])  # 提取 x, y
+            trans = np.array(pose[4:6])  
             if use_rotation:
-                local_pos = ref_rotation.T @ (trans - ref_translation)  # 转换到自车坐标系
-                local_pos = -local_pos  # xy坐标轴恰好都相反
+                local_pos = ref_rotation.T @ (trans - ref_translation)  
+                local_pos = -local_pos  
             else:
-                local_pos = trans  # 不使用旋转，直接使用原始位置
+                local_pos = trans  
             trajectory.append(local_pos.tolist())
 
-        # 4. 计算差分轨迹
         if len(trajectory) >= 2:
             translations = np.array(trajectory)
-            disp_trajectory = np.diff(translations, axis=0)  # 计算差分
+            disp_trajectory = np.diff(translations, axis=0)  
             if start_idx == 0:
-                disp_trajectory = np.vstack(([0, 0], disp_trajectory))  # 第一帧差分补零
+                disp_trajectory = np.vstack(([0, 0], disp_trajectory))  
         else:
-            disp_trajectory = np.array([[0, 0]])  # 单帧时返回零差分
+            disp_trajectory = np.array([[0, 0]])  
 
         return disp_trajectory.tolist()
 
     def get_trajectory(self, frames, index,scene_id):
-        """
-        提取当前帧的前后轨迹，并转换到自车坐标系
-        :param frames: 包含所有帧数据的列表，每帧包含 'pose' 信息
-        :param index: 当前帧的索引
-        :return: 轨迹 ,形状为 (n, 2)
-        """
-        # 1. 确定轨迹的起始和结束索引
         start_idx = max(0, index - self.max_previous_samples)
         end_idx = min(len(frames), index + self.max_next_samples + 1)
 
-        # 2. 获取当前帧的参考位姿
         ref_pose = frames[index]['pose']
-        ref_translation = np.array(ref_pose[4:6])  # 提取 x, y
+        ref_translation = np.array(ref_pose[4:6])
 
-        # 检查四元数是否有效
         quat = ref_pose[:4]
         quat_norm = np.linalg.norm(quat)
-        if quat_norm < 1e-6:  # 如果模接近零，跳过该帧或使用默认值.的确有一些pose中的数据全为0000000，全静止
+        if quat_norm < 1e-6: 
             # print(f"Warning: Invalid quaternion (norm={quat_norm}) at frame {index}.scene{scene_id}. Using raw trajectory.")
             use_rotation = False
         else:
             use_rotation = True
-            ref_rotation = R.from_quat(quat).as_matrix()[:2, :2]  # 提取旋转矩阵的前两行
+            ref_rotation = R.from_quat(quat).as_matrix()[:2, :2] 
 
-        # 3. 提取轨迹并转换到自车坐标系（如果需要）
         trajectory = []
         for i in range(start_idx, end_idx):
             pose = frames[i]['pose']
-            trans = np.array(pose[4:6])  # 提取 x, y
+            trans = np.array(pose[4:6]) 
             if use_rotation:
-                local_pos = ref_rotation.T @ (trans - ref_translation)  # 转换到自车坐标系
-                local_pos = -local_pos  # xy坐标轴恰好都相反
+                local_pos = ref_rotation.T @ (trans - ref_translation)  
+                local_pos = -local_pos  
             else:
-                local_pos = trans  # 不使用旋转，直接使用原始位置
+                local_pos = trans  
             # trajectory.append(local_pos.tolist())
-            # 将坐标从 (x, y) 转换为 (y, -x)
-            new_x = local_pos[1]   # 原y作为新x
-            new_y = -local_pos[0]  # 原x取反作为新y
-            trajectory.append([new_x, new_y])  # 直接构造新坐标
+            # (x, y) -> (y, -x)
+            new_x = local_pos[1]  
+            new_y = -local_pos[0]  
+            trajectory.append([new_x, new_y])  
         trajectory=self.clean_trajectory(trajectory, self.max_next_samples, self.max_previous_samples)
         return trajectory
 
@@ -175,7 +155,6 @@ class OnceProcessor:
        
 
     def compute_diff_trajectory(self, traj):
-        """计算轨迹的差分（相邻点的差分）"""
         return [[traj[i+1][0] - traj[i][0], traj[i+1][1] - traj[i][1]] for i in range(len(traj) - 1)]
 
     def save_output(self, processed_data):
@@ -187,9 +166,8 @@ class OnceProcessor:
             with open(self.output_file, 'w', encoding='utf-8') as f:
                 for entry in processed_data:
                     for item in entry:
-                        # 将每个条目转换为 JSON 字符串并写入文件
                         json_line = json.dumps(item, ensure_ascii=False)
-                        f.write(json_line + '\n')  # 每行一个 JSON 对象
+                        f.write(json_line + '\n') 
             print(f"Processed data saved to {self.output_file}")
         except Exception as e:
             print(f"Error saving output file: {e}")

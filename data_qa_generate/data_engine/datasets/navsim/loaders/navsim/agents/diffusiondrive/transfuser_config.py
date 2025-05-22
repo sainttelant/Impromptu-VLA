@@ -15,8 +15,8 @@ class TransfuserConfig:
 
     image_architecture: str = "resnet34"
     lidar_architecture: str = "resnet34"
-    bkb_path: str = "/baai-cwm-1/baai_cwm_ml/algorithm/huanang.gao/shared/jinkun.liu/DiffusionDrive/weights/pytorch_model.bin"
-    plan_anchor_path: str = "/baai-cwm-1/baai_cwm_ml/algorithm/huanang.gao/shared/jinkun.liu/DiffusionDrive/weights/kmeans_navsim_traj_20.npy"
+    bkb_path: str = ""
+    plan_anchor_path: str = ""
 
     latent: bool = False
     latent_rad_thresh: float = 4 * np.pi / 9

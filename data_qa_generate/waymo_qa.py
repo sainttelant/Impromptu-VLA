@@ -11,7 +11,7 @@ data_root = project_root / "data_raw" / "waymo"
 qa_root = project_root / "data_qa_results" / "waymo"
 os.makedirs(qa_root, exist_ok=True)
 
-# 判断车辆在自车的什么位置 （前面、左前、右前、左后、右后、后面）
+
 def get_obj_rel_position(loc):
     x, y = loc[0], loc[1]
     angle = math.degrees(math.atan2(x, -y))
@@ -93,8 +93,7 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
         else:
             speed_plans.append("const")
     speed_plans += [speed_plans[-1]] * num_fut
-    
-    # 提取横向位置和纵向位置
+
     path_plans = []
     for i in range(len(raw_xy) - num_fut):
         xys = raw_xy[i: i + num_fut]
@@ -123,7 +122,7 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
     
     # navigation
     navi_commands = []
-    if len(raw_xy) >= num_fut_navi + 1:  # 需要有足够点计算起始和结束角度
+    if len(raw_xy) >= num_fut_navi + 1: 
         for i in range(len(raw_xy) - num_fut_navi):
             xys = raw_xy[i: i + num_fut_navi]
             start_angle = cal_angel(xys[1][0] - xys[0][0], xys[1][1] - xys[0][1])
@@ -144,16 +143,15 @@ def get_plan(raw_poses, num_fut = 4, num_fut_navi = 12,vel_navi_thresh=4.0,vel_d
                 navi_command = 'go straight'
             navi_commands.append(navi_command)
         
-        # 填充到与raw_xy相同长度
-        if navi_commands:  # 确保navi_commands不为空
+
+        if navi_commands:  
             pad_length = len(raw_xy) - len(navi_commands)
             navi_commands += [navi_commands[-1]] * pad_length
         else:
             navi_commands = ["go straight"] * len(raw_xy)
     else:
-        # 数据不足时默认直行
         navi_commands = ["go straight"] * len(raw_xy)
-      # 确保长度一致
+
     assert len(speeds) == len(speed_plans) == len(path_plans)==len(navi_commands)
     return speeds.tolist() if isinstance(speeds, np.ndarray) else speeds, speed_plans, path_plans,navi_commands    
 
@@ -401,7 +399,7 @@ def gen_qa(data_root, qa_root):
             
             file_list = {}
             for view in views:
-                file_list[view] = [f"/share/gha/workspace/DriveEMMA/images/slink/waymo/{sp}/{seq}/images/{view}/{img}" for img in sorted(os.listdir(f"{data_root}/{sp}/{seq}/images/{view}"))[::5]]
+                file_list[view] = [f"{data_root}/{sp}/{seq}/images/{view}/{img}" for img in sorted(os.listdir(f"{data_root}/{sp}/{seq}/images/{view}"))[::5]]
             
             # pdb.set_trace()
             images = [[file_list[key][i] for key in views] for i in range(len(ego))]
