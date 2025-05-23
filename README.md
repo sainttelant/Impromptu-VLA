@@ -27,6 +27,17 @@ Here are the key players:
 
 **Pro Tip:** We highly recommend creating a dedicated virtual environment (using tools like `conda` or `venv`) to manage the dependencies for this project. This helps keep your workspace clean and avoids conflicts with other Python projects. Happy configuring! 👩‍💻
 
+### Download Pre-trained Models
+
+|Method|Download|
+|-|-|
+|  3B Base+nuScenes  | [HF Hub](https://huggingface.co/aaaaaap/ImpromptuVLAModel/tree/main/3B_Base_finetune) |
+|   3B Base+Impromptu   | [HF Hub](https://huggingface.co/aaaaaap/ImpromptuVLAModel/tree/main/3B_AD) |
+|   3B Base+Impromptu+nuScenes   | [HF Hub](https://huggingface.co/aaaaaap/ImpromptuVLAModel/tree/main/3B_AD_finetune) |
+|   7B Base+nuScenes   | [HF Hub](https://huggingface.co/aaaaaap/ImpromptuVLAModel/tree/main/7B_Base_finetune) |
+|    7B Base+Impromptu  | [HF Hub](https://huggingface.co/aaaaaap/ImpromptuVLAModel/tree/main/7B_AD) |
+|   7B Base+Impromptu+nuScenes   | [HF Hub](https://huggingface.co/aaaaaap/ImpromptuVLAModel/tree/main/7B_AD_finetune) |
+
 ### 🚀 Model Training
 
 To start training, simply run the following command:
@@ -67,10 +78,9 @@ Replace the placeholders with your actual paths:
 * `<path_to_lora_adapter_checkpoint>`: Path to the fine-tuned LoRA checkpoint (e.g., `checkpoint-xxx`)
 * `<path_to_save_merged_model>`: Directory to save the merged model
 
+### Prompts
+The prompts we use can be found in [prompts](prompts.md).
 
-### 📊 Evaluation
+### 📊 Close-loop Evaluation with NeuroNCAP
 
-We provide two distinct evaluation methodologies to rigorously assess performance:
-
-  * **Open-loop Evaluation on nuScenes Dataset**: For insights into our model's predictive capabilities in an open-loop setting, please refer to our detailed guide: [Open-loop Evaluation]() 📝
-  * **Close-loop Evaluation with NeuroNCAP**: To understand the system's performance within a closed-loop simulation environment, delve into the specifics of our NeuroNCAP-based evaluation: [Close-loop Evaluation](neuroncap_evaluation/evaluation.md) 🎮
+To understand the system's performance within a closed-loop simulation environment, delve into the specifics of our NeuroNCAP-based evaluation: [Close-loop Evaluation](neuroncap_evaluation/evaluation.md) 🎮
