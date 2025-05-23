@@ -1,6 +1,6 @@
 # Impromptu-VLA
 
-Our dataset can be accessed at https://huggingface.co/datasets/aaaaaap/unstructed
+Our dataset can be accessed at [huggingface](https://huggingface.co/datasets/aaaaaap/unstructed)
 
 If you want to create our benchmark QA data from scratch:
 
@@ -21,9 +21,9 @@ We leverage some powerful open-source libraries to make this project shine. To e
 
 Here are the key players:
 
-* **sglang**: Your go-to for efficient large language model serving. Check out their setup guide here: [https://github.com/sgl-project/sglang](https://github.com/sgl-project/sglang) ✨
-* **LLaMA-Factory**: A comprehensive and user-friendly framework for fine-tuning large language models. Dive into their documentation for installation details: [https://github.com/hiyouga/LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) 🛠️
-* **vLLM**: For high-throughput and low-latency inference. Find out how to get it running here: [https://github.com/vllm-project/vllm](https://github.com/vllm-project/vllm) ⚡
+* **sglang**: Your go-to for efficient large language model serving. Check out their setup guide here: [sglang](https://github.com/sgl-project/sglang) ✨
+* **LLaMA-Factory**: A comprehensive and user-friendly framework for fine-tuning large language models. Dive into their documentation for installation details: [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) 🛠️
+* **vLLM**: For high-throughput and low-latency inference. Find out how to get it running here: [vllm](https://github.com/vllm-project/vllm) ⚡
 
 **Pro Tip:** We highly recommend creating a dedicated virtual environment (using tools like `conda` or `venv`) to manage the dependencies for this project. This helps keep your workspace clean and avoids conflicts with other Python projects. Happy configuring! 👩‍💻
 
