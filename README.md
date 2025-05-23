@@ -66,3 +66,11 @@ Replace the placeholders with your actual paths:
 * `<path_to_base_model>`: Path to the original pretrained model (e.g., Qwen2-VL-3B-Instruct)
 * `<path_to_lora_adapter_checkpoint>`: Path to the fine-tuned LoRA checkpoint (e.g., `checkpoint-xxx`)
 * `<path_to_save_merged_model>`: Directory to save the merged model
+
+
+### 📊 Evaluation
+
+We provide two distinct evaluation methodologies to rigorously assess performance:
+
+  * **Open-loop Evaluation on nuScenes Dataset**: For insights into our model's predictive capabilities in an open-loop setting, please refer to our detailed guide: [Open-loop Evaluation]() 📝
+  * **Close-loop Evaluation with NeuroNCAP**: To understand the system's performance within a closed-loop simulation environment, delve into the specifics of our NeuroNCAP-based evaluation: [Close-loop Evaluation](neuroncap_evaluation/evaluation.md) 🎮
