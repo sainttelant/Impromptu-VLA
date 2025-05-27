@@ -38,6 +38,33 @@ Here are the key players:
 |    7B Base+Impromptu  | [HF Hub](https://huggingface.co/aaaaaap/ImpromptuVLAModel/tree/main/7B_AD) |
 |   7B Base+Impromptu+nuScenes   | [HF Hub](https://huggingface.co/aaaaaap/ImpromptuVLAModel/tree/main/7B_AD_finetune) |
 
+#### Open-loop Evaluation
+
+| Method                                     | L2 Error (m) $\downarrow$ (1s) | L2 Error (m) $\downarrow$ (2s) | L2 Error (m) $\downarrow$ (3s) | L2 Error (m) $\downarrow$ (Avg.) |
+|--------------------------------------------|--------------------------------|--------------------------------|--------------------------------|----------------------------------|
+| DriveVLM      | 0.18                           | 0.34                           | 0.68                           | 0.40                             |
+| OmniDrive    | 0.14                           | 0.29                           | 0.55                           | 0.33                             |
+| DriveVLM-Dual  | 0.15                           | 0.29                           | **0.48** | 0.31                             |
+| EMMA (random init) | 0.15                           | 0.33                           | 0.63                           | 0.37                             |
+| EMMA            | 0.14                           | 0.29                           | 0.54                           | 0.32                             |
+| ~~EMMA~~+             | ~~0.13~~                           | ~~0.27~~                           | ~~0.48~~                           | ~~0.29~~                             |
+| 3B Base+nuScenes                           | 0.14                           | 0.30                           | 0.58                           | 0.34                             |
+| 3B Base+Impromptu+nuScenes                 | **0.13** | **0.27** | 0.52                           | **0.30** |
+| 7B Base+nuScenes                           | **0.13** | 0.28                           | 0.55                           | 0.32                             |
+| 7B Base+Impromptu+nuScenes                 | **0.13** | **0.27** | 0.53                           | **0.30** |
+
+#### Close-loop Evaluation
+
+| Source                    | Method                       | NeuroNCAP Score $\uparrow$ (Avg.) | NeuroNCAP Score $\uparrow$ (Stat.) | NeuroNCAP Score $\uparrow$ (Frontal) | NeuroNCAP Score $\uparrow$ (Side) | Collision rate (%) $\downarrow$ (Avg.) | Collision rate (%) $\downarrow$ (Stat.) | Collision rate (%) $\downarrow$ (Frontal) | Collision rate (%) $\downarrow$ (Side) |
+|---------------------------|------------------------------|-----------------------------------|------------------------------------|--------------------------------------|-----------------------------------|----------------------------------------|-----------------------------------------|-------------------------------------------|----------------------------------------|
+| CVPR 2023                 | UniAD                   | 0.73                              | 0.84                               | 0.10                                 | 1.26                              | 88.6                                   | 87.8                                    | 98.4                                      | 79.6                                   |
+| ICCV 2023                 | VAD                      | 0.66                              | 0.47                               | 0.04                                 | 1.45                              | 92.5                                   | 96.2                                    | 99.6                                      | 81.6                                   |
+| ICRA 2025                 | SparseDrive             | 0.92                              | -                                  | -                                    | -                                 | 93.9                                   | -                                       | -                                         | -                                      |
+| CVPR 2025                 | BridgeAD-S               | 1.52                              | -                                  | -                                    | -                                 | 76.2                                   | -                                       | -                                         | -                                      |
+| CVPR 2025                 | BridgeAD-B             | 1.60                              | -                                  | -                                    | -                                 | 72.6                                   | -                                       | -                                         | -                                      |
+| -                         | 3B Base+nuScenes                | 1.77                              | **1.80** | 1.67                                 | 1.75                              | 72.5                                   | **68.0** | 73.0                                      | 71.5                                   |
+| -                         | **3B Base+Impromptu+nuScenes**| **2.15** | 1.77                               | **2.31** | **2.10** | **65.5** | 70.0                                    | **59.0** | **65.0** |
+
 ### 🚀 Model Training
 
 To start training, simply run the following command:
