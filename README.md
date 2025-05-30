@@ -4,12 +4,12 @@ This repository contains the code for the following work:
 
 > Impromptu VLA: Open Weights and Open Data for Driving Vision-Language-Action Models
 
-ProjectPage:http://Impromptu-VLA.c7w.tech/
+## [ProjectPage](http://Impromptu-VLA.c7w.tech/)
 
-Haohan Chi$^{*,1}$, [Huan-ang Gao$^{*,1}$](https://c7w.tech/about/), Ziming Liu$^{\dagger,2}$, Jianing Liu$^{1}$, Chenyu Liu$^{1}$, Jinwei Li$^{1}$, Kaisen Yang$^{1}$, Yangcheng Yu$^{1}$, Zeda Wang$^{1}$, Wenyi Li$^{1}$, Leichen Wang$^{2}$, Xingtao Hu$^{2}$, Hao Sun$^{2}$, [Hang Zhao$^{3}$](https://hangzhaomit.github.io/), [Hao Zhao$^{1,\dagger}$](https://sites.google.com/view/fromandto/)
+Haohan Chi*,¹, Huan-ang Gao*,¹, Ziming Liu†,², Jianing Liu¹, Chenyu Liu¹, Jinwei Li¹, Kaisen Yang¹, Yangcheng Yu¹, Zeda Wang¹, Wenyi Li¹, Leichen Wang², Xingtao Hu², Hao Sun², Hang Zhao³, Hao Zhao¹,†
 
-$^1$AIR, Tsinghua University    $^2$Bosch Research    $^3$IIIS, Tsinghua University
-$^*$Equal contribution    $^\dagger$Corresponding author
+¹AIR, Tsinghua University, ²Bosch Research, ³IIIS, Tsinghua University, *Equal contribution, †Corresponding author
+
 <div align="center">
    <img width="33%" src="images/tsinghua.png">
 </div>
@@ -499,38 +499,25 @@ The prompts we use can be found in [prompts](prompts.md).
 To understand the system's performance within a closed-loop simulation environment, delve into the specifics of our NeuroNCAP-based evaluation: [Close-loop Evaluation](neuroncap_evaluation/evaluation.md) 🎮
 
 ### 🎬 Video Gallery
-The videos compare the driving behavior of the two models in three representative challenging scenarios: stationary, frontal, and side. For each scenario, the left column shows the behavior of the base model, which is fine-tuned on nuScenes. The right column shows the performance of the model trained on a subset of our proposed dataset and then fine-tuned on nuScenes. Compared to the base model, the model using our data can better avoid vehicles by turning, slowing down, etc.
+The videos compare the driving behavior of the two models in three representative challenging scenarios: stationary, frontal, and side. For each scenario, **the left column shows the behavior of the base model, which is fine-tuned on nuScenes. The right column shows the performance of the model trained on a subset of our proposed dataset and then fine-tuned on nuScenes**. Compared to the base model, the model using our data can better avoid vehicles by turning, slowing down, etc.
 
+#### stationary
 
-<p align="center">
-  <div align="center" style="font-size: 2em;">stationary</div>
+Base+nuScenes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Base+Impromptu+nuScenes  
+<img src="assets/gifs/stationary/1.gif" width="100%" style="max-width: 100%; height: auto;" />
+<img src="assets/gifs/stationary/2.gif" width="100%" style="max-width: 100%; height: auto;" />
+<img src="assets/gifs/stationary/3.gif" width="100%" style="max-width: 100%; height: auto;" />
 
-  <div style="display: flex; justify-content: space-around; width: 100%;">
-    <div style="text-align: center; flex: 1;">Base+nuScenes</div>
-    <div style="text-align: center; flex: 1;">Base+Impromptu+nuScenes</div>
-  </div>
+#### side
 
-  <img src="assets/gifs/stationary/1.gif" width="100%" style="max-width: 100%; height: auto;" />
-  <img src="assets/gifs/stationary/2.gif" width="100%" style="max-width: 100%; height: auto;" />
-  <img src="assets/gifs/stationary/3.gif" width="100%" style="max-width: 100%; height: auto;" />
+Base+nuScenes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Base+Impromptu+nuScenes  
+<img src="assets/gifs/side/1.gif" width="100%" style="max-width: 100%; height: auto;" />
+<img src="assets/gifs/side/2.gif" width="100%" style="max-width: 100%; height: auto;" />
+<img src="assets/gifs/side/3.gif" width="100%" style="max-width: 100%; height: auto;" />
 
-  <div align="center" style="font-size: 2em;">side</div>
+#### frontal
 
-  <div style="display: flex; justify-content: space-around; width: 100%;">
-    <div style="text-align: center; flex: 1;">Base+nuScenes</div>
-    <div style="text-align: center; flex: 1;">Base+Impromptu+nuScenes</div>
-  </div>
-  <img src="assets/gifs/side/1.gif" width="100%" style="max-width: 100%; height: auto;" />
-  <img src="assets/gifs/side/2.gif" width="100%" style="max-width: 100%; height: auto;" />
-  <img src="assets/gifs/side/3.gif" width="100%" style="max-width: 100%; height: auto;" />
-
-  <div align="center" style="font-size: 2em;">side</div>
-
-  <div style="display: flex; justify-content: space-around; width: 100%;">
-    <div style="text-align: center; flex: 1;">Base+nuScenes</div>
-    <div style="text-align: center; flex: 1;">Base+Impromptu+nuScenes</div>
-  </div>
-  <img src="assets/gifs/frontal/1.gif" width="100%" style="max-width: 100%; height: auto;" />
-  <img src="assets/gifs/frontal/2.gif" width="100%" style="max-width: 100%; height: auto;" />
-  <img src="assets/gifs/frontal/3.gif" width="100%" style="max-width: 100%; height: auto;" />
-</p>
+Base+nuScenes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Base+Impromptu+nuScenes  
+<img src="assets/gifs/frontal/1.gif" width="100%" style="max-width: 100%; height: auto;" />
+<img src="assets/gifs/frontal/2.gif" width="100%" style="max-width: 100%; height: auto;" />
+<img src="assets/gifs/frontal/3.gif" width="100%" style="max-width: 100%; height: auto;" />
