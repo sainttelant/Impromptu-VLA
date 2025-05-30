@@ -17,7 +17,7 @@ $^*$Equal contribution    $^\dagger$Corresponding author
 <br>
 <div align="center">
   <img src="https://img.shields.io/github/license/ahydchh/Impromptu-VLA.svg" alt="License">
-  <a href=""><img alt='arXiv' src="https://img.shields.io/badge/arXiv-to be added-red"></a>
+  <a href="https://arxiv.org/abs/2505.23757"><img alt='arXiv' src="https://img.shields.io/badge/arXiv-to be added-red"></a>
   <a href="https://huggingface.co/datasets/aaaaaap/unstructed"><img alt='Dataset' src="https://img.shields.io/badge/Dataset-Impromptu--VLA-blue"></a>
   <a href="https://Impromptu-VLA.c7w.tech/"><img alt='Project Page' src="https://img.shields.io/badge/Webpage-Impromptu--VLA-green"></a>
 </div>
