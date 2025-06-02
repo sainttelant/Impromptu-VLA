@@ -6,7 +6,7 @@ This repository contains the code for the following work:
 
 ## [ProjectPage](http://Impromptu-VLA.c7w.tech/)
 
-Haohan Chi*,¹, Huan-ang Gao*,¹, Ziming Liu†,², Jianing Liu¹, Chenyu Liu¹, Jinwei Li¹, Kaisen Yang¹, Yangcheng Yu¹, Zeda Wang¹, Wenyi Li¹, Leichen Wang², Xingtao Hu², Hao Sun², Hang Zhao³, Hao Zhao¹,†
+Haohan Chi*,¹, [Huan-ang Gao*,¹](https://c7w.tech/), Ziming Liu†,², Jianing Liu¹, Chenyu Liu¹, Jinwei Li¹, Kaisen Yang¹, Yangcheng Yu¹, Zeda Wang¹, Wenyi Li¹, Leichen Wang², Xingtao Hu², Hao Sun², [Hang Zhao³](https://hangzhaomit.github.io/), [Hao Zhao¹,†](https://sites.google.com/view/fromandto/)
 
 ¹AIR, Tsinghua University, ²Bosch Research, ³IIIS, Tsinghua University, *Equal contribution, †Corresponding author
 
