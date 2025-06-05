@@ -467,6 +467,7 @@ llamafactory-cli train train/Qwen2_5-VL/QA_train_sub_fin_nu/3B_full_QA_train_bs8
 
 This command will launch the training process based on the settings specified in your YAML config file. Make sure the path is correct and all necessary parameters are properly configured.
 
+Training and testing data for nuScenes can be found in [nuscenes_train.json](nuscenes_train.json) and [nuscenes_test.json](nuscenes_train.json) respectively.
 
 ### 🧠 Inference
 
