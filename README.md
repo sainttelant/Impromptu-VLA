@@ -474,23 +474,14 @@ Training and testing data for nuScenes can be found in [nuscenes_train.json](nus
 To run inference with a fine-tuned model, you need to use the following command:
 
 ```bash
-llamafactory-cli export \
-  --model_name_or_path <path_to_base_model> \
-  --adapter_name_or_path <path_to_lora_adapter_checkpoint> \
-  --template qwen2_vl \
-  --finetuning_type lora \
-  --export_dir <path_to_save_merged_model> \
-  --cutoff_len 4096 \
-  --export_size 2 \
-  --export_device cpu \
-  --export_legacy_format false
+python train/inference_scripts/sglang_infer.py --model_name_or_path <model_name_or_path> --dataset <dataset_name> --save_name <output_path> --template qwen2_vl --tensor_parallel_size 1 --data_parallel_size 1
 ```
 
 Replace the placeholders with your actual paths:
 
-* `<path_to_base_model>`: Path to the original pretrained model (e.g., Qwen2-VL-3B-Instruct)
-* `<path_to_lora_adapter_checkpoint>`: Path to the fine-tuned LoRA checkpoint (e.g., `checkpoint-xxx`)
-* `<path_to_save_merged_model>`: Directory to save the merged model
+* `<model_name_or_path>`: Name or path to the original pretrained model (e.g., Qwen2-VL-3B-Instruct)
+* `<dataset_name>`: dataset name in dataset_info.json folling [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)
+* `<output_path>`: Path to save inference results
 
 ### 🎯 Prompts
 The prompts we use can be found in [prompts](prompts.md).

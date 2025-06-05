@@ -1,3 +1,5 @@
 *.json
 *.jsonl
 **/__pycache__/
+!nuscenes_test.json
+!nuscenes_train.json
