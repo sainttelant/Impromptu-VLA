@@ -490,6 +490,13 @@ The prompts we use can be found in [prompts](prompts.md).
 
 To understand the system's performance within a closed-loop simulation environment, delve into the specifics of our NeuroNCAP-based evaluation: [Close-loop Evaluation](neuroncap_evaluation/evaluation.md) 🎮
 
+#### Diagnostic Evaluation of VLM Capabilities on Impromptu VLA
+We provide the evaluation script, which you can call in the following way
+```
+python scripts/calculate_accuracy.py --gt_folder /path/to/gt/folder --pred_folder /path/to/pred/folder --save_path /path/to/save/results
+```
+
+
 ### 🎬 Video Gallery
 The videos compare the driving behavior of the two models in three representative challenging scenarios: stationary, frontal, and side. For each scenario, **the left column shows the behavior of the base model, which is fine-tuned on nuScenes. The right column shows the performance of the model trained on a subset of our proposed dataset and then fine-tuned on nuScenes**. Compared to the base model, the model using our data can better avoid vehicles by turning, slowing down, etc.
 
