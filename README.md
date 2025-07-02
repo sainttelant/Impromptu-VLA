@@ -468,29 +468,21 @@ llamafactory-cli train train/Qwen2_5-VL/QA_train_sub_fin_nu/3B_full_QA_train_bs8
 
 This command will launch the training process based on the settings specified in your YAML config file. Make sure the path is correct and all necessary parameters are properly configured.
 
+Training and testing data for nuScenes can be found in [nuscenes_train.json](nuscenes_train.json) and [nuscenes_test.json](nuscenes_train.json) respectively.
 
 ### 🧠 Inference
 
 To run inference with a fine-tuned model, you need to use the following command:
 
 ```bash
-llamafactory-cli export \
-  --model_name_or_path <path_to_base_model> \
-  --adapter_name_or_path <path_to_lora_adapter_checkpoint> \
-  --template qwen2_vl \
-  --finetuning_type lora \
-  --export_dir <path_to_save_merged_model> \
-  --cutoff_len 4096 \
-  --export_size 2 \
-  --export_device cpu \
-  --export_legacy_format false
+python train/inference_scripts/sglang_infer.py --model_name_or_path <model_name_or_path> --dataset <dataset_name> --save_name <output_path> --template qwen2_vl --tensor_parallel_size 1 --data_parallel_size 1
 ```
 
 Replace the placeholders with your actual paths:
 
-* `<path_to_base_model>`: Path to the original pretrained model (e.g., Qwen2-VL-3B-Instruct)
-* `<path_to_lora_adapter_checkpoint>`: Path to the fine-tuned LoRA checkpoint (e.g., `checkpoint-xxx`)
-* `<path_to_save_merged_model>`: Directory to save the merged model
+* `<model_name_or_path>`: Name or path to the original pretrained model (e.g., Qwen2-VL-3B-Instruct)
+* `<dataset_name>`: dataset name in dataset_info.json folling [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)
+* `<output_path>`: Path to save inference results
 
 ### 🎯 Prompts
 The prompts we use can be found in [prompts](prompts.md).
@@ -498,6 +490,13 @@ The prompts we use can be found in [prompts](prompts.md).
 ### 📊 Close-loop Evaluation with NeuroNCAP
 
 To understand the system's performance within a closed-loop simulation environment, delve into the specifics of our NeuroNCAP-based evaluation: [Close-loop Evaluation](neuroncap_evaluation/evaluation.md) 🎮
+
+#### Diagnostic Evaluation of VLM Capabilities on Impromptu VLA
+We provide the evaluation script, which you can call in the following way
+```
+python scripts/calculate_accuracy.py --gt_folder /path/to/gt/folder --pred_folder /path/to/pred/folder --save_path /path/to/save/results
+```
+
 
 ### 🎬 Video Gallery
 The videos compare the driving behavior of the two models in three representative challenging scenarios: stationary, frontal, and side. For each scenario, **the left column shows the behavior of the base model, which is fine-tuned on nuScenes. The right column shows the performance of the model trained on a subset of our proposed dataset and then fine-tuned on nuScenes**. Compared to the base model, the model using our data can better avoid vehicles by turning, slowing down, etc.
