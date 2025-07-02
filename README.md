@@ -40,6 +40,7 @@ If you want to create our benchmark QA data from scratch:
    ```bash
    bash scripts/data_qa_generate.sh
    ```
+5. For generating QA data for the navsim dataset, please refer to the README.md file located at: /data_qa_generate/data_engine/datasets/navsim/README.md
 ---
 ### ✨ Environment Configuration
 

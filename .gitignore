@@ -1,3 +1,5 @@
 *.json
 *.jsonl
 **/__pycache__/
+dataset_generation
+NeuroNCAP

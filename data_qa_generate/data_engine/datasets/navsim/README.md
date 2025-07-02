@@ -50,3 +50,7 @@ cd ..
 ### 4. Install Navsim Datasets
 NavSim:https://github.com/autonomousvision/navsim
 The NavSim dataset is located under the path `data_qa_generate/data_engine/data_storage/external_datasets/navsim`.
+
+### 5. Generate Navsim Data_QA
+python data_qa_generate/data_engine/datasets/navsim/q7_navsim.py
+python data_qa_generate/data_engine/datasets/navsim/navsim_qa.py
