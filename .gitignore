@@ -6,3 +6,6 @@
 !dataset_info.json
 dataset_generation
 NeuroNCAP/
+data/jsons
+data/train
+data/val

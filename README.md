@@ -484,6 +484,16 @@ Replace the placeholders with your actual paths:
 * `<dataset_name>`: dataset name in dataset_info.json folling [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)
 * `<output_path>`: Path to save inference results
 
+### Data Organization
+
+If you are not building your data from the original eight datasets but are using the data we provide, this section will guide you on how to organize WebDataset formatted data into usable JSON files using code.
+
+Assuming you have downloaded our dataset to the `./ImpromptuData` folder, you can process the data into JSON format by running `scripts/data_organize.py`. You can specify either `train` or `val` using the `split` parameter. The results will be stored by default under `data/`, in separate `train` and `val` subfolders, with each original dataset stored individually.
+
+Next, you can run `scripts/format.py` to ensure the data conforms to our required format.
+
+Finally, execute `scripts/merge_data.py` to integrate data from different datasets. The merged data will be stored in the `data/json` folder.
+
 ### 🎯 Prompts
 The prompts we use can be found in [prompts](prompts.md).
 
