@@ -13,6 +13,9 @@ project_root = script_path.parent.parent.parent
 # print(project_root)
 data_dir_train = project_root / "data_raw" / "waymo"/"training"
 data_dir_val = project_root / "data_raw" / "waymo"/"validation"
+processed_dir = project_root / "data_raw" / "waymo_processed"
+processed_dir_train = processed_dir / "training"
+processed_dir_val = processed_dir / "validation"
 output_file_train =Path( project_root / "data_qa_generate" / "data_traj_generate" / "data_traj_results" / "waymo"/"traj_waymo_train.jsonl")
 output_file_val= Path(project_root / "data_qa_generate" / "data_traj_generate" / "data_traj_results" / "waymo"/"traj_waymo_val.jsonl")
 output_file_train.parent.mkdir(parents=True, exist_ok=True)
@@ -21,7 +24,7 @@ raw_hz=10
 step_by_hz=raw_hz//2
 
 class PipelineProcessor:
-    def __init__(self, input_paths, output_paths, max_prev=5, max_next=6, workers=4):
+    def __init__(self, input_paths, output_paths, processed_dir, max_prev=5, max_next=6, workers=4):
 
         if len(output_paths) != 1:
             raise ValueError("Output paths must contain exactly one file")
@@ -31,7 +34,8 @@ class PipelineProcessor:
         self.max_prev = max_prev
         self.max_next = max_next
         self.workers = workers
-
+        self.processed_dir = processed_dir
+        
     def _parse_frame(self, data):
         frame = dataset_pb2.Frame()
         frame.ParseFromString(bytearray(data.numpy()))
@@ -49,14 +53,38 @@ class PipelineProcessor:
         subsscene_data = [all_frames[i] for i in indices]
         
         seq = input_path.split("/")[-1].split(".")[0]
+        with open(f"{self.processed_dir}/{seq}/dynamic_objects_pose.json", "r") as f:
+            dynamic_info = json.load(f)
+
         raw_poses = [np.array(frame.pose.transform).reshape(4, 4).astype(np.float32) for frame in subsscene_data]
+        base_pose = raw_poses[0][:, 3]
+        np.save(f"{self.processed_dir}/{seq}/raw_poses.npy",raw_poses)
+        np.save(f"{self.processed_dir}/{seq}/base_pose.npy",base_pose)
         re_poses = [np.linalg.inv(raw_pose) for raw_pose in raw_poses]
-        
+        np.save(f"{self.processed_dir}/{seq}/re_poses.npy",re_poses)
         sequence_data = {
             "sequence_id": seq,
             "num_frames": len(raw_poses),
             "relative_poses": {}
         }
+        
+        for dcls, cinfo in dynamic_info.items():
+            for dobj in cinfo:
+                strat_idx = dobj["segments"][0]["start_frame"]
+                num_frame = dobj["segments"][0]["n_frames"]
+                rposes = []
+                for trans in dobj["segments"][0]["data"]["transform"]:
+                    npose = np.array(trans, dtype=np.float32)
+                    wpose = npose
+                    wpose[:3] += base_pose[:3]
+                    
+                    for frame_idx in range(strat_idx, strat_idx+num_frame):
+                        rpose = re_poses[frame_idx] @ wpose
+                        rposes.append(rpose.tolist()[:2])
+                dobj["segments"][0]["data"]["transform"] = rposes
+                        
+        with open(f"{self.processed_dir}/{seq}/dynamic_objects_pose_processed.json", "w") as f:
+            json.dump(dynamic_info, f)
         
 
         for j in range(len(raw_poses)):
@@ -96,13 +124,15 @@ if __name__ == "__main__":
         {
             'data_split': 'validation',
             'input_dir': data_dir_val,
-            'output_path': output_file_val
+            'output_path': output_file_val,
+            'processed_dir': processed_dir_val
         },
 
         {
             'data_split': 'training',
             'input_dir': data_dir_train,
-            'output_path': output_file_train
+            'output_path': output_file_train,
+            'processed_dir': processed_dir_train
         }
     ]
 
@@ -112,6 +142,7 @@ if __name__ == "__main__":
         processor = PipelineProcessor(
             input_paths=input_paths,
             output_paths=[config['output_path']],
+            processed_dir=config['processed_dir'],
             max_prev=0,
             max_next=9,
             workers=32

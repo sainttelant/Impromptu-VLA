@@ -11,8 +11,8 @@ We used:
 ### Training set:
 ```bash
 python waymo_parse_tfrecord_main.py \
-    --root <your_waymo_download_path>/waymo/training \
-    --out_root <your_project_path>/ImpromptuDriveBench/data_raw/waymo/training \
+    --root Impromptu-VLA/data_raw/waymo/training \
+    --out_root Impromptu-VLA/data_raw/waymo_processed/training \
     -j16 \
     --ignore_existing
 ```
@@ -20,14 +20,15 @@ python waymo_parse_tfrecord_main.py \
 ### Validation set:
 ```bash
 python waymo_parse_tfrecord_main.py \
-    --root <your_waymo_download_path>/waymo/validation \
-    --out_root <your_project_path>/ImpromptuDriveBench/data_raw/waymo/validation \
+    --root Impromptu-VLA/data_raw/waymo/validation \
+    --out_root Impromptu-VLA/data_raw/waymo_processed/validation \
     -j16 \
     --ignore_existing
 ```
 
+Running the above command will convert the original data from tfrecord format to a more readable form. The important files to use are the `images` folder and `scenario.pt` (which stores scene data). You can then run `python data_raw/waymo_processed_code/dynamic.py --root Impromptu-VLA/data_raw/waymo_processed`, which will extract the required dynamic object data from `scenario.pt` and generate `dynamic_objects.json` and `dynamic_objects_pose.json` to store the original transform matrices of dynamic objects and the x, y, z coordinates extracted from these matrices, respectively. It will also save `raw_poses.npy`, `base_pose.npy`, and `re_poses.npy`, which are the transform matrices, the first element matrix of the sequence, and the inverse of the original transform matrices, respectively. These will be used when generating QA in `data_qa_generate/waymo_qa.py`.
 
 Note:
 You need to keep the tfrecord files, as they will be used by:
-ImpromptuDriveBench/data_qa_generate/data_traj_generate/pipeline_waymo_planning.py
+Impromptu-VLA/data_qa_generate/data_traj_generate/pipeline_waymo_traj.py
 Alternatively, you can modify the code logic in this file.

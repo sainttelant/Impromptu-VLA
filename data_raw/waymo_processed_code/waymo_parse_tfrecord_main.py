@@ -612,7 +612,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--root",
         type=str,
-        default="/mnt/ssd4t/waymo/buchong",
         required=False,
         help="Root directory of raw .tfrecords",
     )
@@ -625,7 +624,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--out_root",
         type=str,
-        default="/mnt/ssd4t/waymo_train/",
         required=False,
         help="Output root directory",
     )
