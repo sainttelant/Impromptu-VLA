@@ -8,7 +8,8 @@ eval_steps: 100
 eval_strategy: 'no'
 finetuning_type: full
 gradient_accumulation_steps: 8
-image_resolution: 262144
+# image_resolution: 262144
+image_max_pixels: 262144
 learning_rate: 5.0e-06
 logging_steps: 10
 lr_scheduler_type: cosine

@@ -78,7 +78,10 @@ def main(
 
     def preprocess_sample(sample, tokenizer, template_obj, image_resolution):
         if sample["images"]:
-            multi_modal_data = template_obj.mm_plugin._regularize_images(sample["images"], image_resolution=image_resolution)
+            image_max_pixels = 262144
+            image_min_pixels = 1024
+            multi_modal_data = template_obj.mm_plugin._regularize_images(
+                sample["images"], image_max_pixels=image_max_pixels, image_min_pixels=image_min_pixels)
             
             new_multi_modal_data = []
             # convert to bytes

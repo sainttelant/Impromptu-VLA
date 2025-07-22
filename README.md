@@ -54,6 +54,8 @@ Here are the key players:
 
 **Pro Tip:** We highly recommend creating a dedicated virtual environment (using tools like `conda` or `venv`) to manage the dependencies for this project. This helps keep your workspace clean and avoids conflicts with other Python projects. Happy configuring! 👩‍💻
 
+To ensure a consistent and reproducible development or production environment, we've provided an environment.yaml file. This file lists all the necessary Conda and pip packages, along with their specific versions.
+
 <section class="section hero is-light">
     <div class="container is-max-desktop">
       <h2 class="title is-3 has-text-centered" style="margin-bottom: 1.2rem;">📊 Results</h2>
