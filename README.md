@@ -499,6 +499,11 @@ Finally, execute `scripts/merge_data.py` to integrate data from different datase
 ### 🎯 Prompts
 The prompts we use can be found in [prompts](prompts.md).
 
+### Open-loop Evaluation
+```
+python data_qa_generate/data_engine/datasets/nuscenes/scripts/evaluation_nuscenes.py --mode x-y --jsonl_file /path/to/input --output_file /path/to/output
+```
+
 ### 📊 Close-loop Evaluation with NeuroNCAP
 
 To understand the system's performance within a closed-loop simulation environment, delve into the specifics of our NeuroNCAP-based evaluation: [Close-loop Evaluation](neuroncap_evaluation/evaluation.md) 🎮
