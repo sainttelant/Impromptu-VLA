@@ -24,9 +24,9 @@ The above-mentioned document includes details such as environment setup for `neu
 In addition to the environment required for running `NeuroNCAP`, you also need to set up a separate environment for configuring the inference API of `sglang`. All occurrences of `/path/to/your/envs/sglang` in the code should be replaced with the actual path to your `sglang` environment.  
 Please refer to the official `sglang` [documentation](https://docs.sglang.ai/start/install.html) for installation instructions.
 
-The original repository uses Docker. We provide a method to directly build a virtual environment without Docker. We provide the .yaml files for neuro-ncap and neurad-studio to facilitate environment construction. They are [neuro-ncap.yaml](neuroncap_evaluation/neuro-ncap.yaml) and [neurad-studio.yaml](neuroncap_evaluation/neurad-studio.yaml) respectively.
+The original repository uses Docker. We provide a method to directly build a virtual environment without Docker. We provide the .yaml files for neuro-ncap and neurad-studio to facilitate environment construction. They are [neuro-ncap.yaml](neuro-ncap.yaml) and [neurad-studio.yaml](neurad-studio.yaml) respectively.
 
-In addition, the previous code could not specify RUNS, NAME, file_path, etc. through parameters. We have now updated the code to support passing these variables through parameters. For specific usage, please refer to [run.sh](neuroncap_evaluation/run.sh)
+In addition, the previous code could not specify RUNS, NAME, file_path, etc. through parameters. We have now updated the code to support passing these variables through parameters. For specific usage, please refer to [run.sh](run.sh)
 
 ## Run the evaluation
 
