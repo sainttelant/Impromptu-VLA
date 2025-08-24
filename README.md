@@ -323,15 +323,15 @@ To ensure a consistent and reproducible development or production environment, w
                 <td>88.6</td>
                 <td>87.8</td>
                 <td>98.4</td>
-                <td>79.6</td>
+                <td><u>79.6</u></td>
               </tr>
               <tr>
                 <td>ICCV 2023</td>
                 <td>VAD<sup>2</sup></td>
-                <td>0.66</td>
+                <td><u>0.66</u></td>
                 <td>0.47</td>
                 <td>0.04</td>
-                <td>1.45</td>
+                <td><u>1.45</u></td>
                 <td>92.5</td>
                 <td>96.2</td>
                 <td>99.6</td>
@@ -368,34 +368,34 @@ To ensure a consistent and reproducible development or production environment, w
                 <td>-</td>
                 <td>-</td>
                 <td>-</td>
-                <td>72.6</td>
+                <td><u>72.6</u></td>
                 <td>-</td>
                 <td>-</td>
                 <td>-</td>
               </tr>
-              <tr style="background:#f0f0f0;">
+              <tr>
                 <td>-</td>
                 <td><u>Base+nuScenes</u></td>
-                <td><u>1.77</u></td>
-                <td><b>1.80</b></td>
-                <td><u>1.67</u></td>
-                <td><u>1.75</u></td>
-                <td><u>72.5</u></td>
-                <td><b>68.0</b></td>
-                <td><u>73.0</u></td>
-                <td><u>71.5</u></td>
+                <td>0.75</td>
+                <td><u>0.99</u></td>
+                <td><u>0.55</u></td>
+                <td>0.70</td>
+                <td>90.0</td>
+                <td><u>88.6</u></td>
+                <td><u>93.2</u></td>
+                <td>88.0</td>
               </tr>
-              <tr style="background:#f0f0f0;">
+              <tr>
                 <td>-</td>
                 <td><b>Base+Impromptu+nuScenes</b></td>
-                <td><b>2.15</b></td>
-                <td><u>1.77</u></td>
-                <td><b>2.31</b></td>
-                <td><b>2.10</b></td>
-                <td><b>65.5</b></td>
-                <td><u>70.0</u></td>
-                <td><b>59.0</b></td>
-                <td><b>65.0</b></td>
+                <td><b>2.06</b></td>
+                <td><b>2.55</b></td>
+                <td><b>1.86</b></td>
+                <td><b>1.78</b></td>
+                <td><b>65.1</b></td>
+                <td><b>54.8</b></td>
+                <td><b>72.8</b></td>
+                <td><b>67.6</b></td>
               </tr>
             </tbody>
           </table>
@@ -410,8 +410,11 @@ To ensure a consistent and reproducible development or production environment, w
           more robust and safer driving policies.
         </div>
       </div>
+      
+**📢 News**: We have updated the results and code of the closed-loop evaluation, see [here](assets/announcement/news.md) for more information.
 
 ### 📥 Download Pre-trained Models
+
   <div style="max-width:900px; margin: 0 auto 2em auto; display: block;">
     <div style="overflow-x: auto;">
       <table class="table is-bordered is-striped is-narrow is-hoverable" style="font-size:0.95em; width:100%;">
