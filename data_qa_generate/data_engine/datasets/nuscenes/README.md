@@ -8,8 +8,8 @@ This module provides guidance for setting up and visualizing results on the NuSc
 
 ### 1. Create and Activate Conda Environment
 ```bash
-conda create --name driveemma_nuscenes python=3.9 -y
-conda activate driveemma_nuscenes
+conda create --name nuscenes python=3.9 -y
+conda activate nuscenes
 ```
 
 ### 2. Install PyTorch
