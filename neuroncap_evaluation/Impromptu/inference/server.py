@@ -1,3 +1,4 @@
+import re
 import io
 import json
 import base64
@@ -98,9 +99,6 @@ def global_to_ego(ego2world, p_global):
     return p_ego
 
 
-import re
-
-
 def extract_trajectory(answer: str) -> List[List[float]]:
     # Try to extract [[x1,y1], [x2,y2], ...]
     try:
@@ -118,7 +116,8 @@ def extract_trajectory(answer: str) -> List[List[float]]:
 def format_ego_status(can) -> str:
 
     if len(can) < 18:
-        raise ValueError("Canbus signal too short; expected at least 17 values.")
+        raise ValueError(
+            "Canbus signal too short; expected at least 17 values.")
 
     x, y = can[0], can[1]
     accel_x, accel_y = can[7], can[8]
@@ -155,7 +154,8 @@ def bytestr_to_numpy(images: Dict[str, Base64Bytes]) -> Dict[str, np.ndarray]:
     for cam_name, img_bytes in images.items():
         try:
             # image_bytes = base64.b64decode(img_bytes)
-            tensor = torch.load(io.BytesIO(img_bytes), weights_only=False).clone()
+            tensor = torch.load(io.BytesIO(img_bytes),
+                                weights_only=False).clone()
             result[cam_name] = tensor.numpy()
         except Exception as e:
             print(f"❌ Failed to decode {cam_name}: {e}")
@@ -231,12 +231,12 @@ async def infer(data: InferenceInputs) -> InferenceOutputs:
     cam_front = imgs_dict["CAM_FRONT"]
     cam_front_right = imgs_dict["CAM_FRONT_RIGHT"]
     cam_front_left = imgs_dict["CAM_FRONT_LEFT"]
-    base64_image = numpy_image_to_base64(cam_front, convert_to_gray=args.ablation_gray)
+    base64_image = numpy_image_to_base64(cam_front)
     right_base64_image = numpy_image_to_base64(
-        cam_front_right, convert_to_gray=args.ablation_gray
+        cam_front_right
     )
     left_base64_image = numpy_image_to_base64(
-        cam_front_left, convert_to_gray=args.ablation_gray
+        cam_front_left
     )
 
     canbus_signal = np.array(data.canbus)
@@ -255,9 +255,11 @@ async def infer(data: InferenceInputs) -> InferenceOutputs:
     # Save back to file
     np.save(file_path, updated_positions)  # Save as .npy file
 
-    print(f"Current canbus_signal[0:3] added, new shape is {updated_positions.shape}")
+    print(
+        f"Current canbus_signal[0:3] added, new shape is {updated_positions.shape}")
 
-    canbus_position = global_to_ego(np.array(data.ego2world), canbus_signal[:3])
+    canbus_position = global_to_ego(
+        np.array(data.ego2world), canbus_signal[:3])
     canbus_signal[:3] = canbus_position
 
     with open(ego_status_path, "r") as f:
